@@ -129,14 +129,14 @@ void USplineChainComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 			FollowWiightMore ? (Point.bFree = false) : (Point.bFree = true);
 			
-			//if (SplineFollowWeight.GetRichCurveConst()->Eval(point.Time) < 0.5f)
-			//{
-			//	point.bFree = false;
-			//}
-			//else
-			//{
-			//	point.bFree = true;
-			//}
+			if (SplineFollowWeight.GetRichCurveConst()->Eval(Point.Time) < 0.5f)
+			{
+				Point.bFree = false;
+			}
+			else
+			{
+				Point.bFree = true;
+			}
 		}
 	}
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
