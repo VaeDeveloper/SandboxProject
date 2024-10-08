@@ -66,9 +66,6 @@ void ASandboxProjectCharacter::SortComparatorActors(TSoftObjectPtr<AActor> First
 	const float DistanceVectorResultFromActor = FVector::Distance(SActorLocation, CharacterLocation);
 
 	Result = DistanceVectorResult > DistanceVectorResultFromActor;
-
-
-
 }
 
 void ASandboxProjectCharacter::BeginPlay()

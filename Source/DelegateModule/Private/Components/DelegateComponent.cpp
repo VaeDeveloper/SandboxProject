@@ -66,7 +66,6 @@ void UDelegateComponent::BeginPlay()
 			int a = 3, b = 5;
 
 			UsualSumm.ExecuteIfBound(a, b, UResult);
-			a++, b++;
 
 			UE_LOG(LogTemp, Warning, TEXT("Usual summ lambda Result = %d"), UResult);
 		}, UsualSummRate, true);
@@ -77,7 +76,9 @@ void UDelegateComponent::BeginPlay()
 			FVector ResultVector;
 			const FVector OwnerLocation = GetOwner()->GetActorLocation();
 			const FVector OwnerRotationVector = GetOwner()->GetActorRotation().Vector();
+
 			ActorLocationSum.ExecuteIfBound(OwnerLocation, OwnerRotationVector, ResultVector);
+
 			UE_LOG(LogTemp, Warning, TEXT(" Result Vector = %s"), *ResultVector.ToString());
 		}, UsualSummRate, true);
 }
@@ -124,7 +125,7 @@ void UDelegateComponent::TestTimerDelegate()
 			int a = 10, b = 20;
 			
 			UsualMulticastSumm.Broadcast(a, b, UResult);
-			++a, ++b;
+			
 
 			UE_LOG(LogTemp, Warning, TEXT("Result = %d"), UResult);
 

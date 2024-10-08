@@ -8,6 +8,9 @@
 #include "UObject/ScriptMacros.h"
 #include "Engine/World.h"
 
+// no TAtomic Epic Games 
+#include <atomic>
+
 DEFINE_LOG_CATEGORY_STATIC(ThreadLog, All, All);
 
 /**
@@ -28,6 +31,8 @@ UThreadComponent::UThreadComponent()
 void UThreadComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AtomicFunctionTest();
 
 	// Initiates an asynchronous task to draw a point in the world.
 	DrawPointAsyncTask();
@@ -77,6 +82,7 @@ void UThreadComponent::BeginPlay()
 				}
 			});
 
+
 		/**
 		 * A more complex asynchronous task using a thread pool to offload work and then return results.
 		 */
@@ -89,41 +95,98 @@ void UThreadComponent::BeginPlay()
 					UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Nummber)
 				});
 
+
 #pragma endregion Async
 
+		// todo 
+		ThreadSafeStackTest();
+
+}
+
+void UThreadComponent::ThreadSafeStackTest()
+{
+#pragma region ThreadSafe
 	/**
-	 * Sets up a repeating timer task that performs thread-safe operations.
-	 */
-	int Count_01 = 0;
-	int Count_02 = 0;
+	* Sets up a repeating timer task that performs thread-safe operations.
+	*/
 	GetWorld()->GetTimerManager().SetTimer(*(new FTimerHandle), [&]() ->void
 		{
 			// Adds items to an array in a thread-safe manner using async tasks.
 			Async(EAsyncExecution::TaskGraph, [&]()->void
 				{
-					FScopeLock ScopeLock{ &Mutex };
-					ThreadSafeTst.Add(Count_01);
-					Count_01++;
+					ThreadSafeStack.Push(new int(1));
 
 				});
 			Async(EAsyncExecution::TaskGraph, [&]()->void
 				{
-					Mutex.Lock();
-					ThreadSafeTst.Add(Count_02);
-					Count_02++;
-					Mutex.Unlock();
-				});        
+					ThreadSafeStack.Push(new int(2));
+				});
 
 			UE_LOG(LogTemp, Error, TEXT("-----------------------"));
 
-			for (int ArrItem : ThreadSafeTst)
+			TArray<int*> StackItems;
+			ThreadSafeStack.PopAll(StackItems);
+			for (int* ArrItem : StackItems)
 			{
-				FScopeLock ScopeLock{ &Mutex };
-				UE_LOG(LogTemp, Warning, TEXT("[ArrayItem] = %i"), ArrItem);
+				UE_LOG(LogTemp, Warning, TEXT("[ArrayItem] = %i"), *ArrItem);
 			}
 
 		}, 5.0f, true, 1.0f);
+#pragma endregion ThreadSafe
+}
 
+void UThreadComponent::AtomicFunctionTest()
+{
+	std::atomic<int> ThreadCounter{ 0 };
+
+	Async(EAsyncExecution::Thread, [&]()->void
+		{
+			FGraphEventArray GraphEvents;
+			for (int i = 0; i < 200; i++)
+			{ // add 200 tasks to graph event list
+				GraphEvents.Add(FFunctionGraphTask::CreateAndDispatchWhenReady([&ThreadCounter] {
+					FPlatformProcess::Sleep(0.005);
+					ThreadCounter++;
+					}));
+			}
+			FTaskGraphInterface::Get().WaitUntilTasksComplete(MoveTemp(GraphEvents), ENamedThreads::AnyThread); // run all tasks in parralel
+		});
+
+	Async(EAsyncExecution::Thread, [&]() -> void
+		{
+			ParallelFor(100, [&ThreadCounter](int32 Index)
+				{
+					FPlatformProcess::Sleep(0.01f);
+					ThreadCounter++;
+				});
+		});
+
+	FPlatformProcess::Sleep(0.03f);
+	UE_LOG(ThreadLog, Warning, TEXT("ThreadCounter Atomic Value is %d"), ThreadCounter.load());
+}
+
+void UThreadComponent::ThreadSafeTestFunction()
+{
+
+	Async(EAsyncExecution::TaskGraph, [this]()->void {
+		FScopeLock ScopeLock{ &Mutex };
+		ThreadSafeTst.Add(1);
+		});
+
+
+	Async(EAsyncExecution::TaskGraph, [this]()->void {
+		Mutex.Lock();
+		ThreadSafeTst.Add(2);
+		Mutex.Unlock();
+		});
+
+	UE_LOG(LogTemp, Warning, TEXT("-------"))
+		// Print Array
+		for (int ArrayItem : ThreadSafeTst) 
+		{
+			FScopeLock ScopeLock{ &Mutex };
+			UE_LOG(LogTemp, Warning, TEXT("[ArrayItem] = %i"), ArrayItem)
+		}
 }
 
 /**

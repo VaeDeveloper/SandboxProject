@@ -44,6 +44,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void ThreadSafeStackTest();
+
+
+	void AtomicFunctionTest();
+
+	void ThreadSafeTestFunction();
+
 
 	/**
 	 * @brief Retrieves a thread-safe copy of an integer array.
@@ -81,7 +88,10 @@ protected:
 	int32 Primes = 10000;
 
 	/** 
-	 * @brief A thread-safe test array, demonstrating thread-safe access patterns. 
+	 * @brief A thread-safe test TLockFreePointerListLIFO, demonstrating thread-safe access patterns. 
 	 */
+	TLockFreePointerListLIFO<int> ThreadSafeStack;
 	TArray<int> ThreadSafeTst;
+	int TimerCount = 0;
+
 };
