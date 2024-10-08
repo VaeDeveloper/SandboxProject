@@ -8,6 +8,7 @@ public class SandboxProjectTarget : TargetRules
 	public SandboxProjectTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
+		ExtraModuleNames.AddRange( new string[] { "AsyncActions" } );
 		ExtraModuleNames.AddRange( new string[] { "ThreadsModule" } );
 		ExtraModuleNames.AddRange( new string[] { "VisualizerModule" } );
 		ExtraModuleNames.AddRange( new string[] { "DelegateModule" } );

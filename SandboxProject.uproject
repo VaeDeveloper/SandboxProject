@@ -35,6 +35,11 @@
 			"AdditionalDependencies": [
 				"Engine"
 			]
+		},
+		{
+			"name": "AsyncActions",
+			"type": "Runtime",
+			"loadingPhase": "Default"
 		}
 	],
 	"Plugins": [
