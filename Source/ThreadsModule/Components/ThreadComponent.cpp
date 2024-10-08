@@ -10,73 +10,95 @@
 
 DEFINE_LOG_CATEGORY_STATIC(ThreadLog, All, All);
 
-
-
-
+/**
+ * @brief Constructor for UThreadComponent.
+ *
+ * Initializes the component and enables ticking if necessary.
+ */
 UThreadComponent::UThreadComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+/**
+ * @brief Called when the game starts or when the component is spawned.
+ *
+ * Initializes thread-based operations and starts asynchronous tasks.
+ */
 void UThreadComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	// DrawPointAsyncTask();
 
+	// Initiates an asynchronous task to draw a point in the world.
+	DrawPointAsyncTask();
 
-//#pragma region Async
-//	AsyncThread([&]()->int
-//		{
-//			return CalculatePrimes(10000);
-//		}, 0.0f, TPri_Normal).Then([&](TFuture<int> Future) -> void
-//			{
-//				if (Future.IsValid())
-//				{
-//					UE_LOG(LogTemp, Warning, TEXT("Calculations Completed"));
-//					UE_LOG(LogTemp, Warning, TEXT("----------------------"));
-//					UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Future.Get())
-//
-//				}
-//			});
-//
-//		TFuture<int> Result = AsyncThread([&]() ->int
-//			{
-//				return CalculatePrimes(20000);
-//			}, 0.0f, TPri_Normal);
-//
-//		Result.Next([&](int Number)->void
-//			{
-//				UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Number)
-//			});
-//
-//		TFuture<int> Result_02 = AsyncThread([&]() -> int
-//			{
-//				return CalculatePrimes(10000);
-//			}, 0.0f, TPri_Normal);
-//
-//		Result_02.Then([&](TFuture<int> Future)->void
-//			{
-//				if (Future.IsValid())
-//				{
-//					UE_LOG(LogTemp, Warning, TEXT("Result calculate in thread is %i"), Future.Get())
-//				}
-//			});
-//
-//		AsyncPool(*GThreadPool, [&]()->int
-//			{
-//				return CalculatePrimes(30000);
-//			}, nullptr, EQueuedWorkPriority::Normal)
-//			.Next([&](int Nummber)->void
-//				{
-//					UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Nummber)
-//				});
-//
-//#pragma endregion Async
+	/**
+	 * Asynchronous prime calculation task with a callback when the task is completed.
+	 * This task runs on a separate thread and logs the result upon completion.
+	 */
+#pragma region Async
+	AsyncThread([&]()->int
+		{
+			return CalculatePrimes(10000);
+		}, 0.0f, TPri_Normal).Then([&](TFuture<int> Future) -> void
+			{
+				if (Future.IsValid())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Calculations Completed"));
+					UE_LOG(LogTemp, Warning, TEXT("----------------------"));
+					UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Future.Get())
 
+				}
+			});
+
+		/**
+		 * Another asynchronous task for prime calculation with a callback after task completion.
+		 */
+		TFuture<int> Result = AsyncThread([&]() ->int
+			{
+				return CalculatePrimes(20000);
+			}, 0.0f, TPri_Normal);
+
+		Result.Next([&](int Number)->void
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Number)
+			});
+
+		TFuture<int> Result_02 = AsyncThread([&]() -> int
+			{
+				return CalculatePrimes(10000);
+			}, 0.0f, TPri_Normal);
+
+		Result_02.Then([&](TFuture<int> Future)->void
+			{
+				if (Future.IsValid())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Result calculate in thread is %i"), Future.Get())
+				}
+			});
+
+		/**
+		 * A more complex asynchronous task using a thread pool to offload work and then return results.
+		 */
+		AsyncPool(*GThreadPool, [&]()->int
+			{
+				return CalculatePrimes(30000);
+			}, nullptr, EQueuedWorkPriority::Normal)
+			.Next([&](int Nummber)->void
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Result calculated in thread is %i"), Nummber)
+				});
+
+#pragma endregion Async
+
+	/**
+	 * Sets up a repeating timer task that performs thread-safe operations.
+	 */
 	int Count_01 = 0;
 	int Count_02 = 0;
 	GetWorld()->GetTimerManager().SetTimer(*(new FTimerHandle), [&]() ->void
 		{
+			// Adds items to an array in a thread-safe manner using async tasks.
 			Async(EAsyncExecution::TaskGraph, [&]()->void
 				{
 					FScopeLock ScopeLock{ &Mutex };
@@ -104,18 +126,34 @@ void UThreadComponent::BeginPlay()
 
 }
 
+/**
+ * @brief Returns a thread-safe copy of the array.
+ *
+ * This function locks the array using a mutex to ensure thread safety during the copy operation.
+ *
+ * @return A copy of the thread-safe array.
+ */
 TArray<int> UThreadComponent::GetThreadSafeArray() const
 {
 	FScopeLock ScopeLock{ &Mutex };
 	return ThreadSafeTst;
-
 }
+
+/**
+ * @brief Calculates the first N prime numbers.
+ *
+ * @param Amount The number of prime numbers to calculate (default is 500).
+ * @return The highest prime number found.
+ *
+ * This function performs CPU-intensive calculations to find prime numbers and logs the time it took to complete.
+ */
 
 int UThreadComponent::CalculatePrimes(int Amount)
 {
 	double StartTime = FPlatformTime::Seconds();
 	UE_LOG(ThreadLog, Warning, TEXT("Searching for primes"));
 
+	// Lambda function to check if a number is prime.
 	TFunction<bool(int)> IsPrime = [](int num) ->bool
 		{
 			if (num < 2) return false;
@@ -147,6 +185,11 @@ int UThreadComponent::CalculatePrimes(int Amount)
 	return CurrentTestNumber;
 }
 
+/**
+ * @brief Asynchronously performs background calculations and draws a debug point in the world upon completion.
+ *
+ * This function demonstrates the use of Unreal Engine's async tasks to perform background work and update the game world afterward.
+ */
 void UThreadComponent::DrawPointAsyncTask()
 {
 	const TWeakObjectPtr<UWorld> WeakWorld(GetWorld());
@@ -182,6 +225,16 @@ void UThreadComponent::DrawPointAsyncTask()
 
 }
 
+/**
+ * @brief Asynchronously spawns actors in batches in the game world.
+ *
+ * @param World Pointer to the current UWorld context.
+ * @param ActorClass The class of the actors to be spawned.
+ * @param TotalActors The total number of actors to spawn.
+ * @param ActorsPerBatch The number of actors to spawn per batch.
+ *
+ * This function uses async tasks to batch spawn actors in the game world to minimize main thread load.
+ */
 void UThreadComponent::SpawnActorsAsync(UWorld* World, TSubclassOf<AActor> ActorClass, int32 TotalActors, int32 ActorsPerBatch)
 {
 	AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [World, ActorClass, TotalActors, ActorsPerBatch]()
