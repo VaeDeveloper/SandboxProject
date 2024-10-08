@@ -37,9 +37,12 @@
 			]
 		},
 		{
-			"name": "AsyncActions",
-			"type": "Runtime",
-			"loadingPhase": "Default"
+			"Name": "AsyncActions",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
