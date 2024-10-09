@@ -32,10 +32,10 @@ void UThreadComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AtomicFunctionTest();
+	//AtomicFunctionTest();
 
 	// Initiates an asynchronous task to draw a point in the world.
-	DrawPointAsyncTask();
+	// DrawPointAsyncTask();
 
 	/**
 	 * Asynchronous prime calculation task with a callback when the task is completed.
@@ -99,7 +99,7 @@ void UThreadComponent::BeginPlay()
 #pragma endregion Async
 
 		// todo 
-		ThreadSafeStackTest();
+		// ThreadSafeStackTest();
 
 }
 
@@ -115,7 +115,6 @@ void UThreadComponent::ThreadSafeStackTest()
 			Async(EAsyncExecution::TaskGraph, [&]()->void
 				{
 					ThreadSafeStack.Push(new int(1));
-
 				});
 			Async(EAsyncExecution::TaskGraph, [&]()->void
 				{
