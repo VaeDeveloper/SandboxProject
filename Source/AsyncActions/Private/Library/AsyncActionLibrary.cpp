@@ -12,12 +12,25 @@ DEFINE_LOG_CATEGORY_STATIC(AsyncActionLibraryLog, All, All);
  * progression of the delayed action. It monitors elapsed time and triggers specific
  * outputs based on the time that has passed.
  */
-void UAsyncActionLibrary::DelayedSequence(UObject* WorldContextObject, EDelayedInput Inputs, EDelayedExits& Outputs, FLatentActionInfo LatentInfo)
+void UAsyncActionLibrary::DelayedSequence(UObject* WorldContextObject, EDelayedInput Inputs, EDelayedExits& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1 , float CustomDelay2, float CustomDelay3)
 {
+
+	struct FDelayTimes
+	{
+		float Delay1;
+		float Delay2;
+		float Delay3;
+
+		FDelayTimes(float InDelay1, float InDelay2, float InDelay3)
+			: Delay1(InDelay1), Delay2(InDelay2), Delay3(InDelay3) {}
+	};
+
 	class FDelaySequenceAction : public FPendingLatentAction
 	{
 		/** The total time that has elapsed since the start of the action. */
 		float TotalTime = 0.0f;
+
+		FDelayTimes Delays;
 
 	public:
 		/** The name of the execution function to be triggered after the delay. */
@@ -35,8 +48,6 @@ void UAsyncActionLibrary::DelayedSequence(UObject* WorldContextObject, EDelayedI
 		/** A reference to the delayed exit value to output when the sequence completes. */
 		EDelayedExits& Outputs;
 
-		/** A flag indicating if the half-second trigger has occurred. */
-		bool bHalfTriggered = false;
 		
 		/**
 		 * @brief Constructor for the delayed sequence action.
@@ -47,12 +58,13 @@ void UAsyncActionLibrary::DelayedSequence(UObject* WorldContextObject, EDelayedI
 		 * @param InInputs The delay input value.
 		 * @param InOutputs A reference to the delayed exit output value.
 		 */
-		FDelaySequenceAction(const FLatentActionInfo& LatentInfo, EDelayedInput InInputs, EDelayedExits& InOutputs)
+		FDelaySequenceAction(const FLatentActionInfo& LatentInfo, EDelayedInput InInputs, EDelayedExits& InOutputs, FDelayTimes& InDelayTimes)
 			: ExecutionFunction(LatentInfo.ExecutionFunction)
 			, OutputLink(LatentInfo.Linkage)
 			, CallbackTarget(LatentInfo.CallbackTarget)
 			, Outputs(InOutputs)
 			, Inputs(InInputs)
+			, Delays(InDelayTimes)
 		{
 			UE_LOG(AsyncActionLibraryLog, Warning, TEXT("latent action has been started"));
 		}
@@ -75,52 +87,57 @@ void UAsyncActionLibrary::DelayedSequence(UObject* WorldContextObject, EDelayedI
 		{
 			TotalTime += Response.ElapsedTime();
 			
-			bool condition2 = TotalTime >= 2.0f && Inputs == EDelayedInput::Delay2;
-			bool condition1 = TotalTime >= 1.0f && Inputs == EDelayedInput::Delay1;
-			bool condition05 = TotalTime >= 0.5f && Inputs == EDelayedInput::Execute;
+			// Список задержек и проверка для выполнения условий
+			const TArray<float> DelayTimes = { Delays.Delay1, Delays.Delay2, Delays.Delay3 };
 
-			if (condition2)
+			const TArray<EDelayedInput> InputConditions = { EDelayedInput::Execute, EDelayedInput::Delay1, EDelayedInput::Delay2 };
+			const TArray<EDelayedExits> OutputConditions = { EDelayedExits::Then, EDelayedExits::Exit1, EDelayedExits::Exit2 };
+
+
+			for (int32 i = 0; i < DelayTimes.Num(); ++i)
 			{
-				Outputs = EDelayedExits::Exit2;
-				Response.FinishAndTriggerIf(condition2, ExecutionFunction, OutputLink, CallbackTarget);
+				if (TotalTime >= DelayTimes[i] && Inputs == InputConditions[i])
+				{
+					Outputs = OutputConditions[i];
+					Response.FinishAndTriggerIf(true, ExecutionFunction, OutputLink, CallbackTarget);
+					return;
+				}
 			}
-			else if (condition1)
-			{
-				Outputs = EDelayedExits::Exit1;
-				Response.FinishAndTriggerIf(condition1, ExecutionFunction, OutputLink, CallbackTarget);
-			}
-			else if (condition05)
-			{
-				Outputs = EDelayedExits::Then;
-				Response.FinishAndTriggerIf(condition05, ExecutionFunction, OutputLink, CallbackTarget);
-			}
-			else
-			{
-				Response.DoneIf(TotalTime > 3);
-			}
+
+			Response.DoneIf(TotalTime > Delays.Delay3 + 1.0f);
 		}
 
 		/** Notifies that the object has been destroyed, cleaning up the latent action. */
 		virtual void NotifyObjectDestroyed() override
 		{
-			delete this;
+			
 		}
 
 		/** Notifies that the action has been aborted, cleaning up the latent action. */
 		virtual void NotifyActionAborted() override
 		{
-			delete this;
 		}
 	};
 
 	// Check if the world context object is valid and retrieve the latent action manager
 	if (UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject))
 	{
-		FLatentActionManager& LatentActionManager = World->GetLatentActionManager(); //Get LatentActionManager
-		if (LatentActionManager.FindExistingAction<FDelaySequenceAction>(LatentInfo.CallbackTarget, LatentInfo.UUID) == NULL)
+		FLatentActionManager& LatentActionManager = World->GetLatentActionManager();
+		if (LatentActionManager.FindExistingAction<FDelaySequenceAction>(LatentInfo.CallbackTarget, LatentInfo.UUID) == nullptr)
 		{
-			// Add the new FDelaySequenceAction to the LatentActionManager
-			LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, new FDelaySequenceAction(LatentInfo, Inputs, Outputs));
+			// Создание структуры задержек
+			FDelayTimes Delays(CustomDelay1, CustomDelay2, CustomDelay3);
+
+			// Создание и добавление новой задержки в LatentActionManager
+			TUniquePtr<FDelaySequenceAction> NewAction = MakeUnique<FDelaySequenceAction>(LatentInfo, Inputs, Outputs, Delays);
+			LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, NewAction.Release());
+		}
+		else
+		{
+			UE_LOG(AsyncActionLibraryLog, Warning, TEXT("Latent action already exists for UUID: %d"), LatentInfo.UUID);
 		}
 	}
-}
+	else
+	{
+		UE_LOG(AsyncActionLibraryLog, Error, TEXT("Failed to get world context object"));
+	}}
