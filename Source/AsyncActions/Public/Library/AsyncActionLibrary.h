@@ -79,4 +79,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LatentActions|DelaySequence", meta = (ExpandEnumAsExecs = "Inputs, Outputs", Latent, LatentInfo = "LatentInfo", WorldContext = "WorldContextObject", KeyWords = "sleep"))
 	static void DelayedSequence(UObject* WorldContextObject, EDelayedInput Inputs, EDelayedExits& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1 = 0.5f, float CustomDelay2 = 1.0f, float CustomDelay3 = 2.0f);
 
+
+	/* TODO add two flow delay sequence and three flow sequence and four flow sequence */
+
+	// UFUNCTION(BlueprintCallable, Category = "LatentAction|DelaySequence", meta = (ExpandEnumAsExecs = "Inputs, Outputs", Latent, LatentInfo = "LatentInfo", WorldContext = "WorldContextObject", KeyWords = "sleep"))
+	// static void DelaySequenceTwoIteration(UObject* WorldCotenxtObject);
 };
