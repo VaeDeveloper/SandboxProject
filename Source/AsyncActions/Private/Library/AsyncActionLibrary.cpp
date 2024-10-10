@@ -176,12 +176,12 @@ void UAsyncActionLibrary::DelayedSequenceTwoStreams(UObject* WorldContextObject,
 		FWeakObjectPtr CallbackTarget;
 
 		/** The delayed input value that determines the delay duration. */
-		EDelayedInput Inputs;
+		EDelayedInputTwoStream Inputs;
 
 		/** A reference to the delayed exit value to output when the sequence completes. */
-		EDelayedExits& Outputs;
+		EDelayedExitsTwoStream& Outputs;
 
-		FDelayActionSequence(const FLatentActionInfo& LatentInfo, EDelayedInput InInputs, EDelayedExits& InOutputs, FDelayTimesTwoStreams& InDelayTimes)
+		FDelayActionSequence(const FLatentActionInfo& LatentInfo, EDelayedInputTwoStream InInputs, EDelayedExitsTwoStream& InOutputs, FDelayTimesTwoStreams& InDelayTimes)
 			: ExecutionFunction(LatentInfo.ExecutionFunction)
 			, OutputLink(LatentInfo.Linkage)
 			, CallbackTarget(LatentInfo.CallbackTarget)
@@ -204,8 +204,8 @@ void UAsyncActionLibrary::DelayedSequenceTwoStreams(UObject* WorldContextObject,
 			// —писок задержек и проверка дл€ выполнени€ условий
 			const TArray<float> DelayTimes = { DelayTimes2Sreams.Delay1, DelayTimes2Sreams.Delay2};
 
-			const TArray<EDelayedInput> InputConditions = { EDelayedInput::Execute, EDelayedInput::Delay1, EDelayedInput::Delay2 };
-			const TArray<EDelayedExits> OutputConditions = { EDelayedExits::Then, EDelayedExits::Exit1, EDelayedExits::Exit2 };
+			const TArray<EDelayedInputTwoStream> InputConditions = { EDelayedInputTwoStream::Execute, EDelayedInputTwoStream::Delay1 };
+			const TArray<EDelayedExitsTwoStream> OutputConditions = { EDelayedExitsTwoStream::Then, EDelayedExitsTwoStream::Exit1};
 
 
 			for (int32 i = 0; i < DelayTimes.Num(); ++i)

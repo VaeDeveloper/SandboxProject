@@ -9,6 +9,28 @@
 
 #include "AsyncActionLibrary.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EDelayedInputTwoStream : uint8
+{
+	/** Executes after a delay of 0.5 seconds. */
+	Execute UMETA(DisplayName = "Delay 0.5"),
+
+	/** Executes after a delay of 1 second. */
+	Delay1  UMETA(DisplayName = "Delay 1"),
+
+};
+
+UENUM(BlueprintType)
+enum class EDelayedExitsTwoStream : uint8
+{
+	/** Exits after 0.5 seconds. */
+	Then UMETA(DisplayName = "Exit 0.5"),
+
+	/** Exits after 1 second. */
+	Exit1 UMETA(DisplayName = "Exit 1"),
+};
+
 /**
  * @brief Enumeration for delayed input actions.
  *
