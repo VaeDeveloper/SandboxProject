@@ -156,7 +156,7 @@ void UAsyncActionLibrary::DelayedsequenceThreeStreams(UObject* WorldContextObjec
 	}
 }
 
-void UAsyncActionLibrary::DelayedSequenceTwoStreams(UObject* WorldContextObject, EDelayedInput Inputs, EDelayedExits& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1, float CustomDelay2)
+void UAsyncActionLibrary::DelayedSequenceTwoStreams(UObject* WorldContextObject, EDelayedInputTwoStream Inputs, EDelayedExitsTwoStream& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1, float CustomDelay2)
 {
 	class FDelayActionSequence : public FPendingLatentAction
 	{

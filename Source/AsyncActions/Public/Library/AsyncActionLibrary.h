@@ -103,6 +103,6 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "LatentActions|DelaySequence", meta = (ExpandEnumAsExecs = "Inputs, Outputs", Latent, LatentInfo = "LatentInfo", WorldContext = "WorldContextObject", KeyWords = "sleep"))
-	static void DelayedSequenceTwoStreams(UObject* WorldContextObject, EDelayedInput Inputs, EDelayedExits& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1 = 0.5f, float CustomDelay2 = 1.0f);
+	static void DelayedSequenceTwoStreams(UObject* WorldContextObject, EDelayedInputTwoStream Inputs, EDelayedExitsTwoStream& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1 = 0.5f, float CustomDelay2 = 1.0f);
 
 };
