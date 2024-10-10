@@ -91,7 +91,15 @@ protected:
 	 * @brief A thread-safe test TLockFreePointerListLIFO, demonstrating thread-safe access patterns. 
 	 */
 	TLockFreePointerListLIFO<int> ThreadSafeStack;
+	
+	/** 
+	 *
+	 */
 	TArray<int> ThreadSafeTst;
+	
+	/**
+	 *
+	 */
 	int TimerCount = 0;
 
 };
