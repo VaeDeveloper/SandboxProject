@@ -1,13 +1,12 @@
-// This is Sandbox Project. 
-
+// This is Sandbox Project.
 
 #include "Components/DelegateComponent.h"
 
 namespace
 {
-	constexpr float UsualSummRate			= 3.0f;
-	constexpr float ActorLocationSumRate	= 3.0f;
-	constexpr float TestTimerDelegateRate	= 2.5f;
+	constexpr float UsualSummRate = 3.0f;
+	constexpr float ActorLocationSumRate = 3.0f;
+	constexpr float TestTimerDelegateRate = 2.5f;
 }
 
 /**
@@ -18,8 +17,7 @@ namespace
  *
  * @param ObjectInitializer Initialization parameters for the component.
  */
-UDelegateComponent::UDelegateComponent(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UDelegateComponent::UDelegateComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -30,24 +28,11 @@ UDelegateComponent::UDelegateComponent(const FObjectInitializer& ObjectInitializ
 
 	SummStaticTest.AddStatic(&SimpleRawClass::StaticSumm);
 
+	UsualSumm.BindLambda([&](int a, int b, int& c) -> void { c = a + b; });
 
-	/* clang-format off */
-	UsualSumm.BindLambda([&](int a, int b, int& c)->void 
-		{
-			c = a + b;
-		});
+	ActorLocationSum.BindLambda([&](FVector A, FVector B, FVector& Result) { Result = A + B; });
 
-	ActorLocationSum.BindLambda([&](FVector A, FVector B, FVector& Result)
-		{
-			Result = A + B;
-		});
-
-	SimpleDel.BindLambda([]()->void
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Simpe Delegate Called"));
-		});
-	/* clang-format on */
-
+	SimpleDel.BindLambda([]() -> void { UE_LOG(LogTemp, Warning, TEXT("Simpe Delegate Called")); });
 }
 
 /**
@@ -61,9 +46,11 @@ void UDelegateComponent::BeginPlay()
 
 	TestTimerDelegate();
 	ThisComponentGet.Broadcast(this);
-	 
+
 	// UsualSumm delegate execute
-	GetWorld()->GetTimerManager().SetTimer(*(new FTimerHandle()), [this]()->void
+	GetWorld()->GetTimerManager().SetTimer(
+		*(new FTimerHandle()),
+		[this]() -> void
 		{
 			int UResult;
 			int a = 3, b = 5;
@@ -71,10 +58,13 @@ void UDelegateComponent::BeginPlay()
 			UsualSumm.ExecuteIfBound(a, b, UResult);
 
 			UE_LOG(LogTemp, Warning, TEXT("Usual summ lambda Result = %d"), UResult);
-		}, UsualSummRate, true);
-	
+		},
+		UsualSummRate, true);
+
 	// ActorLocationSum delegate execute
-	GetWorld()->GetTimerManager().SetTimer(*(new FTimerHandle()), [this]()->void
+	GetWorld()->GetTimerManager().SetTimer(
+		*(new FTimerHandle()),
+		[this]() -> void
 		{
 			FVector ResultVector;
 			const FVector OwnerLocation = GetOwner()->GetActorLocation();
@@ -83,7 +73,8 @@ void UDelegateComponent::BeginPlay()
 			ActorLocationSum.ExecuteIfBound(OwnerLocation, OwnerRotationVector, ResultVector);
 
 			UE_LOG(LogTemp, Warning, TEXT(" Result Vector = %s"), *ResultVector.ToString());
-		}, UsualSummRate, true);
+		},
+		UsualSummRate, true);
 }
 
 /**
@@ -92,9 +83,10 @@ void UDelegateComponent::BeginPlay()
  * @param ActorList A reference to an array of soft pointers to actors to sort.
  * @param ActorsComparator A delegate that defines the comparison logic.
  */
-void UDelegateComponent::SortActors(UPARAM(ref)TArray<TSoftObjectPtr<AActor>>& ActorList, FDActorsComparator ActorsComparator)
+void UDelegateComponent::SortActors(UPARAM(ref) TArray<TSoftObjectPtr<AActor>>& ActorList, FDActorsComparator ActorsComparator)
 {
-	ActorList.Sort([&](TSoftObjectPtr<AActor> A, TSoftObjectPtr<AActor> B)->bool
+	ActorList.Sort(
+		[&](TSoftObjectPtr<AActor> A, TSoftObjectPtr<AActor> B) -> bool
 		{
 			bool Result = false;
 			ActorsComparator.ExecuteIfBound(A, B, Result);
@@ -122,19 +114,20 @@ void UDelegateComponent::SummInt(int a, int b, int& c)
  */
 void UDelegateComponent::TestTimerDelegate()
 {
-	GetWorld()->GetTimerManager().SetTimer(*(new FTimerHandle()), [this]()->void
+	GetWorld()->GetTimerManager().SetTimer(
+		*(new FTimerHandle()),
+		[this]() -> void
 		{
 			int UResult;
 			int a = 10, b = 20;
-			
+
 			UsualMulticastSumm.Broadcast(a, b, UResult);
-			
 
 			UE_LOG(LogTemp, Warning, TEXT("Result = %d"), UResult);
 
 			if (ArrayAndStringChangeDelegate.IsBound())
 			{
-				const TArray<int> Items = { 5, 4, 2, 1 };
+				const TArray<int> Items = {5, 4, 2, 1};
 				ArrayAndStringChangeDelegate.Broadcast(Items, TEXT("Test"));
 
 				float Result = 0.0f;
@@ -142,11 +135,13 @@ void UDelegateComponent::TestTimerDelegate()
 				float B = 1.1f;
 
 				DelegateFloatSum.Broadcast(A, B, Result);
-				A++; B++;
+				A++;
+				B++;
 
 				UE_LOG(LogTemp, Error, TEXT("Summ Delegate Result = %f"), Result);
 			}
-		}, TestTimerDelegateRate, true);
+		},
+		TestTimerDelegateRate, true);
 }
 
 /**
@@ -158,16 +153,18 @@ void UDelegateComponent::TestTimerDelegate()
 void UDelegateComponent::MakeThreadedDelay(float DelayDuration, FCallResultDelegate ResultDelegate)
 {
 	FSimpleDelegate Delegate;
-	Async(EAsyncExecution::Thread, [&]()->FString
-		{
-			FPlatformProcess::Sleep(DelayDuration);
-			return "Thread Finished ";
-		}).Then([Delegate = MoveTemp(ResultDelegate)](TFuture<FString> Result) -> void
+	Async(EAsyncExecution::Thread,
+		  [&]() -> FString
+		  {
+			  FPlatformProcess::Sleep(DelayDuration);
+			  return "Thread Finished ";
+		  })
+		.Then(
+			[Delegate = MoveTemp(ResultDelegate)](TFuture<FString> Result) -> void
 			{
 				if (Result.IsValid())
 				{
 					Delegate.ExecuteIfBound(Result.Get());
 				}
 			});
-
 }

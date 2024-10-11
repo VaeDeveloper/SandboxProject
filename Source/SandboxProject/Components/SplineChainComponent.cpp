@@ -1,5 +1,4 @@
-// This is Sandbox Project. 
-
+// This is Sandbox Project.
 
 #include "SplineChainComponent.h"
 #include "Components/SplineComponent.h"
@@ -10,8 +9,7 @@
  *
  * @param ObjectInitializer Used to initialize the object.
  */
-USplineChainComponent::USplineChainComponent(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+USplineChainComponent::USplineChainComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SplineFollowWeight.EditorCurveData.AddKey(0, 0);
 	SplineFollowWeight.EditorCurveData.AddKey(0.05, 1);
@@ -31,11 +29,11 @@ void USplineChainComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	if (!SplineComponent)
+	if (! SplineComponent)
 	{
 		TArray<USceneComponent*> ChildrenComponents;
 		GetChildrenComponents(false, ChildrenComponents);
-		
+
 		for (auto& ChildrenComponent : ChildrenComponents)
 		{
 			if (ChildrenComponent->IsA(USplineComponent::StaticClass()))
@@ -51,7 +49,7 @@ void USplineChainComponent::OnRegister()
 					{
 						EndPoint = SplineComponent->GetLocationAtTime(1, ESplineCoordinateSpace::Local);
 					}
-					
+
 					this->InitChain();
 					return;
 				}
@@ -128,7 +126,7 @@ void USplineChainComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			bool FollowWiightMore = SplineFollowWeight.GetRichCurveConst()->Eval(Point.Time) < 0.5f;
 
 			FollowWiightMore ? (Point.bFree = false) : (Point.bFree = true);
-			
+
 			if (SplineFollowWeight.GetRichCurveConst()->Eval(Point.Time) < 0.5f)
 			{
 				Point.bFree = false;

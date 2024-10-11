@@ -1,7 +1,8 @@
-// This is Sandbox Project. 
+// This is Sandbox Project.
 
 #include "SceneComponentVisualizer.h"
 #include "GameFramework/Actor.h"
+
 #include "Components/ActorComponent.h"
 
 namespace
@@ -24,7 +25,7 @@ namespace
 void SceneComponentVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
 	const USceneComponent* TestComponent = Cast<USceneComponent>(Component);
-	if (!TestComponent) return;
+	if (! TestComponent) return;
 
 	FTransform TM = TestComponent->GetComponentTransform();
 	TM.RemoveScaling();
@@ -34,7 +35,7 @@ void SceneComponentVisualizer::DrawVisualization(const UActorComponent* Componen
 	DrawWireSphereAutoSides(PDI, TM, FColor(200, 255, 255), Radius, SDPG_World);
 
 	const AActor* OwnerActor = TestComponent->GetOwner();
-	if (!OwnerActor) return;
+	if (! OwnerActor) return;
 
 	TArray<USceneComponent*> ChildComponents;
 	OwnerActor->GetComponents(ChildComponents);
@@ -43,7 +44,7 @@ void SceneComponentVisualizer::DrawVisualization(const UActorComponent* Componen
 	for (int i = 0; i < CompCount; i++)
 	{
 		const USceneComponent* pConnectedComponent = ChildComponents[i];
-		if (!pConnectedComponent) continue;
+		if (! pConnectedComponent) continue;
 
 		FTransform ConnectedTarget = pConnectedComponent->GetComponentTransform();
 		ConnectedTarget.RemoveScaling();

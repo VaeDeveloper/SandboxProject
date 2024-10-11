@@ -6,8 +6,7 @@ DECLARE_LOG_CATEGORY_EXTERN(AsyncActions, All, All);
 
 class FAsyncActions : public IModuleInterface
 {
-	public:
-
+public:
 	/* Called when the module is loaded */
 	virtual void StartupModule() override;
 

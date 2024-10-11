@@ -2,14 +2,11 @@
 
 #include "Modules/ModuleManager.h"
 
-
-
 DECLARE_LOG_CATEGORY_EXTERN(VisualizerModule, All, All);
 
 class FVisualizerModule : public IModuleInterface
 {
-	public:
-
+public:
 	/* Called when the module is loaded */
 	virtual void StartupModule() override;
 

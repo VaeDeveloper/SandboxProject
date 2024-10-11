@@ -1,4 +1,4 @@
-// This is Sandbox Project. 
+// This is Sandbox Project.
 
 #pragma once
 
@@ -36,7 +36,7 @@ public:
 	 */
 	void SpawnActorsAsync(UWorld* World, TSubclassOf<AActor> ActorClass, int32 TotalActors, int32 ActorsPerBatch);
 
-	/** 
+	/**
 	 * @brief Thread-safe critical section to protect shared resources.
 	 */
 	mutable FCriticalSection Mutex;
@@ -46,11 +46,9 @@ protected:
 
 	void ThreadSafeStackTest();
 
-
 	void AtomicFunctionTest();
 
 	void ThreadSafeTestFunction();
-
 
 	/**
 	 * @brief Retrieves a thread-safe copy of an integer array.
@@ -60,7 +58,7 @@ protected:
 	 * This function ensures that data access from multiple threads does not cause race conditions.
 	 */
 	TArray<int> GetThreadSafeArray() const;
-	
+
 	/**
 	 * @brief Calculates the first N prime numbers.
 	 *
@@ -70,7 +68,7 @@ protected:
 	 * This function performs CPU-intensive calculations and can be used to benchmark performance or offload tasks to a background thread.
 	 */
 	int CalculatePrimes(int Amount = 500);
-	
+
 	/**
 	 * @brief Asynchronously draws a point using a task-based system.
 	 *
@@ -87,19 +85,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Threads|Test")
 	int32 Primes = 10000;
 
-	/** 
-	 * @brief A thread-safe test TLockFreePointerListLIFO, demonstrating thread-safe access patterns. 
+	/**
+	 * @brief A thread-safe test TLockFreePointerListLIFO, demonstrating thread-safe access patterns.
 	 */
 	TLockFreePointerListLIFO<int> ThreadSafeStack;
-	
-	/** 
+
+	/**
 	 *
 	 */
 	TArray<int> ThreadSafeTst;
-	
+
 	/**
 	 *
 	 */
 	int TimerCount = 0;
-
 };

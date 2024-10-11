@@ -1,13 +1,11 @@
-// This is Sandbox Project. 
-
+// This is Sandbox Project.
 
 #include "ChainComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "EngineGlobals.h"
 
-UChainComponent::UChainComponent(const FObjectInitializer& ObjectInitializer)
-	:Super(ObjectInitializer)
+UChainComponent::UChainComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -126,7 +124,7 @@ void UChainComponent::InitChain()
 void UChainComponent::DrawChainPoints()
 {
 #if WITH_EDITOR
-	if (!bDrawDebugger || ChainPoints.Num() < 2) return;
+	if (! bDrawDebugger || ChainPoints.Num() < 2) return;
 
 	const int32 LineEndMultiply = 5;
 	const int32 SphereSegments = 4;
@@ -214,10 +212,10 @@ void UChainComponent::ApplyGravity()
 	{
 		if (Point.bFree)
 		{
-			FVector Velocity = (Point.Position - Point.OldPosition) + GravityVector; 
+			FVector Velocity = (Point.Position - Point.OldPosition) + GravityVector;
 			Point.OldPosition = Point.Position;
-			Point.Position += Velocity; 
-			Point.Velocity = Velocity;  
+			Point.Position += Velocity;
+			Point.Velocity = Velocity;
 		}
 	}
 }
@@ -237,7 +235,7 @@ void UChainComponent::SolveConstraint()
 	{
 		for (int32 j = 0; j < NumSegments; j++)
 		{
-			UpdatePoint(j, ChainPoints[j], ChainPoints[j + 1], SegmentLength, 1); 
+			UpdatePoint(j, ChainPoints[j], ChainPoints[j + 1], SegmentLength, 1);
 		}
 
 		UpdatePoint(NumSegments, ChainPoints[NumSegments], ChainPoints[NumSegments - 1], SegmentLength, 1);
@@ -276,7 +274,7 @@ void UChainComponent::ResolveCollision()
 							{
 								Normal = ChainPoints[i].Position - ChainPoints[j].Position;
 								Normal *= ((Normal.Size() - SelfCollisionWidth) / SelfCollisionWidth);
-								if (!Normal.IsNearlyZero(SelfCollisionThreshold))
+								if (! Normal.IsNearlyZero(SelfCollisionThreshold))
 								{
 									ChainPoints[i].Force += Normal;
 								}
@@ -286,16 +284,7 @@ void UChainComponent::ResolveCollision()
 				}
 
 				TArray<FHitResult> HitResult;
-				bool Hitted = World->SweepMultiByChannel(
-					HitResult
-					, ChainPoints[i].Position
-					, ChainPoints[i].Position + ChainPoints[i].Velocity
-					, FQuat::Identity
-					, GetCollisionObjectType()
-					, FCollisionShape::MakeSphere(0.5f * ChainWidth)
-					, Params
-					, ResponseParam
-				);
+				bool Hitted = World->SweepMultiByChannel(HitResult, ChainPoints[i].Position, ChainPoints[i].Position + ChainPoints[i].Velocity, FQuat::Identity, GetCollisionObjectType(), FCollisionShape::MakeSphere(0.5f * ChainWidth), Params, ResponseParam);
 
 				if (Hitted)
 				{
@@ -303,11 +292,11 @@ void UChainComponent::ResolveCollision()
 
 					for (int32 j = 0; j < HitResult.Num(); j++)
 					{
-						if (HitResult[j].bStartPenetrating) 
+						if (HitResult[j].bStartPenetrating)
 						{
 							ChainPoints[i].Position += (HitResult[j].Normal * HitResult[j].PenetrationDepth);
 						}
-						else 
+						else
 						{
 							ChainPoints[i].Position = HitResult[j].Location;
 						}
@@ -316,7 +305,7 @@ void UChainComponent::ResolveCollision()
 						float nDelta = Delta | HitResult[j].Normal;
 						FVector plane = Delta - (nDelta * HitResult[j].Normal);
 						ChainPoints[i].OldPosition += nDelta * HitResult[j].Normal;
-						
+
 						if (Friction > KINDA_SMALL_NUMBER)
 						{
 							ChainPoints[i].OldPosition += plane * Friction;
@@ -338,7 +327,7 @@ void UChainComponent::UpdateMeshes()
 {
 	for (int32 i = 0; i < ChainPoints.Num(); i++)
 	{
-		FChainPointData& ChainPoint = ChainPoints[i]; 
+		FChainPointData& ChainPoint = ChainPoints[i];
 
 		ChainPoint.Transform.SetLocation(ChainPoint.Position);
 		ChainPoint.Transform.SetRotation(ChainPoint.Rotation.Quaternion());
@@ -396,7 +385,6 @@ void UChainComponent::UpdatePoint(size_t i, FChainPointData& p1, FChainPointData
 	p1.Rotation = p1.Direction.ToOrientationRotator();
 
 	p1.Rotation.Add(90 + AdditiveRotation.X * i, AdditiveRotation.Y * i, AdditiveRotation.Z * i);
-
 }
 
 FVector UChainComponent::GetChainEndPoint() const
@@ -407,18 +395,16 @@ FVector UChainComponent::GetChainEndPoint() const
 	}
 
 	USceneComponent* EndComponent = Cast<USceneComponent>(AttachEndTo.GetComponent(GetOwner()));
-	
+
 	if (EndComponent)
 	{
-		return (AttachEndToSocket != NAME_None)
-			? EndComponent->GetSocketLocation(AttachEndToSocket)
-			: (bIsLocal ? EndComponent->GetComponentTransform().TransformPosition(EndPoint) : EndComponent->GetComponentLocation());
+		return (AttachEndToSocket != NAME_None) ? EndComponent->GetSocketLocation(AttachEndToSocket) : (bIsLocal ? EndComponent->GetComponentTransform().TransformPosition(EndPoint) : EndComponent->GetComponentLocation());
 	}
 
-	return FVector::ZeroVector; 
+	return FVector::ZeroVector;
 }
 
-void UChainComponent::CalculateChainPoint(bool bIsAttached, FComponentReference& AttachRef, FName AttachSocket, int32 PointIndex, bool bUseEndPoint )
+void UChainComponent::CalculateChainPoint(bool bIsAttached, FComponentReference& AttachRef, FName AttachSocket, int32 PointIndex, bool bUseEndPoint)
 {
 	if (bIsAttached)
 	{
@@ -433,9 +419,7 @@ void UChainComponent::CalculateChainPoint(bool bIsAttached, FComponentReference&
 			USceneComponent* component = Cast<USceneComponent>(AttachRef.GetComponent(GetOwner()));
 			if (component)
 			{
-				ChainPoints[PointIndex].Position = (AttachSocket != NAME_None)
-					? component->GetSocketLocation(AttachSocket)
-					: (bUseEndPoint && bIsLocal ? component->GetComponentTransform().TransformPosition(EndPoint) : component->GetComponentLocation());
+				ChainPoints[PointIndex].Position = (AttachSocket != NAME_None) ? component->GetSocketLocation(AttachSocket) : (bUseEndPoint && bIsLocal ? component->GetComponentTransform().TransformPosition(EndPoint) : component->GetComponentLocation());
 			}
 		}
 	}

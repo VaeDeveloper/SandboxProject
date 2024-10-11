@@ -152,9 +152,10 @@ private:
 	 * @param OutputsConditions Array of output enums to match the input conditions.
 	 */
 	template <typename InputEnum, typename OutputEnum>
-	static void GeneralizedDelayedSequence(
-		UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions);
+	static void GeneralizedDelayedSequence(UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions);
 };
+
+// TODO !!! надо доделать, ноды не работают так как до рефакторинга... Ошибка где то в шаблоне ....
 
 template <typename InputEnum, typename OutputEnum>
 inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions)
@@ -183,8 +184,7 @@ inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContex
 
 			public:
 				FDelaySequenceAction(const FLatentActionInfo& LatentInfo, OutputEnum& InOutputs, const TArray<float>& InDelays, const TArray<InputEnum>& InInputsConditions, const TArray<OutputEnum>& InOutputsConditions)
-					: Outputs(InOutputs), Delays(InDelays), InputsConditions(InInputsConditions), OutputsConditions(InOutputsConditions), ExecutionFunction(LatentInfo.ExecutionFunction), OutputLink(LatentInfo.Linkage),
-					  CallbackTarget(LatentInfo.CallbackTarget)
+					: Outputs(InOutputs), Delays(InDelays), InputsConditions(InInputsConditions), OutputsConditions(InOutputsConditions), ExecutionFunction(LatentInfo.ExecutionFunction), OutputLink(LatentInfo.Linkage), CallbackTarget(LatentInfo.CallbackTarget)
 				{
 					// constructor logic
 				}

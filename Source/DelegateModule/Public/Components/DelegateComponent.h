@@ -1,4 +1,4 @@
-// This is Sandbox Project. 
+// This is Sandbox Project.
 
 #pragma once
 
@@ -18,7 +18,7 @@ struct FMapContainer
 {
 	GENERATED_BODY()
 
-	FMapContainer() {};
+	FMapContainer(){};
 
 	/**
 	 * @brief A map that associates FName keys with integer values.
@@ -28,7 +28,6 @@ struct FMapContainer
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FName, int> DelegateNameIntMap;
 };
-
 
 /**
  * @brief A simple class that provides summation methods.
@@ -45,11 +44,8 @@ public:
 	 * @param b The second integer.
 	 * @param c The result of the sum, passed by reference.
 	 */
-	void Summ(int a, int b, int& c)
-	{
-		c = a + b;
-	}
-	
+	void Summ(int a, int b, int& c) { c = a + b; }
+
 	/**
 	 * @brief A static method that sums two integers and stores the result in a reference parameter.
 	 *
@@ -57,12 +53,8 @@ public:
 	 * @param b The second integer.
 	 * @param c The result of the sum, passed by reference.
 	 */
-	static void StaticSumm(int a, int b, int& c)
-	{
-		c = a + b;
-	}
+	static void StaticSumm(int a, int b, int& c) { c = a + b; }
 };
-
 
 /**
  * @brief A delegate that is called with a single FString parameter.
@@ -114,20 +106,18 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FSummStaticTest, int NumA, int NumB, int&
  */
 DECLARE_DELEGATE_ThreeParams(FActorLocationSum, FVector VectorA, FVector VectorB, FVector& Result);
 
-
-
 /**
  * @brief A component that manages delegates for various operations.
  *
  * This class allows for dynamic and multicast delegates, enabling
  * flexible event handling and callback functionality within the game.
  */
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent, PrioritizeCategories = "DelegateComponent"))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, PrioritizeCategories = "DelegateComponent"))
 class DELEGATEMODULE_API UDelegateComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	/**
 	 * @brief Constructor for UDelegateComponent.
 	 *
@@ -152,7 +142,7 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, Category = "DelegateComponent|Delegates")
 	FDelegateComponentGet ThisComponentGet;
-	
+
 	/**
 	 * @brief A delegate that sums two floats and returns the result.
 	 */
@@ -211,6 +201,7 @@ protected:
 	 * Initializes any necessary operations at the start of the game.
 	 */
 	virtual void BeginPlay() override;
+
 private:
 	/** Initializes a timer to test delegate functionality. */
 	void TestTimerDelegate();

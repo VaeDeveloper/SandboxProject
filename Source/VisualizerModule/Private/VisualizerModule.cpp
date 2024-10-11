@@ -25,7 +25,6 @@ void FVisualizerModule::ShutdownModule()
 	{
 		GUnrealEd->UnregisterComponentVisualizer(UVisualizeSceneComponent::StaticClass()->GetFName());
 	}
-
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -1,4 +1,4 @@
-// This is Sandbox Project. 
+// This is Sandbox Project.
 
 #pragma once
 
@@ -28,7 +28,8 @@ struct FChainPointData
 {
 	GENERATED_BODY()
 
-	FChainPointData()
+	/* clang-format off */
+	FChainPointData() 
 		: bFree(true)
 		, Position(0, 0, 0)
 		, OldPosition(0, 0, 0)
@@ -37,8 +38,11 @@ struct FChainPointData
 		, Rotation(0, 0, 0)
 		, Transform(Rotation, Position)
 		, Time(0)
-		, Index(0)
-	{}
+		, Index(0) 
+	{
+		// TODO !!! 
+	}
+	/* clang-format on */
 
 	/**
 	 * Indicates whether this point is free (simulating) or fixed to another object.
@@ -111,7 +115,6 @@ struct FChainPointData
 	FVector Direction;
 };
 
-
 /**
  * UChainComponent is a custom Unreal Engine component that handles chain-like behavior.
  * It extends the UMeshComponent and provides functionality for rendering, physics, and sound events
@@ -177,13 +180,9 @@ public:
 	 * @return An array of FChainPointData containing information about each chain point.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "ChainComponent|Chain Component")
-	FORCEINLINE TArray<FChainPointData> GetChainPoints()
-	{
-		return ChainPoints;
-	}
+	FORCEINLINE TArray<FChainPointData> GetChainPoints() { return ChainPoints; }
 
 protected:
-
 	/**
 	 * Initializes the chain's parameters and properties.
 	 * This function is called at the start to set up the chain.
@@ -258,12 +257,10 @@ protected:
 	 */
 	float SegmentLength;
 
-
 	/**
 	 * An array holding the data for each point in the chain.
 	 */
 	TArray<FChainPointData> ChainPoints;
-
 
 	//---data---
 public:
@@ -469,12 +466,19 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "ChainComponent|ChainSound", meta = (UIMin = 0.0, ShortToolTip = "Skip counter by frame for calling OnSoundReach event call"))
 	int SoundSkip = 1;
 
-
 private:
+	/**
+	 * TODO !!! чеза хрень?
+	 */
 	void CalculateChainEnd(FVector& ChainEndResult);
+
+	/**
+	 *
+	 */
 	void CalculateChainPoint(bool bIsAttached, FComponentReference& AttachRef, FName AttachSocket, int32 PointIndex, bool bUseEndPoint = false);
+
+	/**
+	 *
+	 */
 	FVector GetChainEndPoint() const;
-
-
-
 };

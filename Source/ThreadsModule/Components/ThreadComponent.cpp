@@ -8,7 +8,7 @@
 #include "UObject/ScriptMacros.h"
 #include "Engine/World.h"
 
-// no TAtomic Epic Games 
+// no TAtomic using Epic Games Recomendation using std::atomic 
 #include <atomic>
 
 DEFINE_LOG_CATEGORY_STATIC(ThreadLog, All, All);
