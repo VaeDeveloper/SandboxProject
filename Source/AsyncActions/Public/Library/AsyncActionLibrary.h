@@ -73,16 +73,16 @@ enum class EDelayedExitsThreeStream : uint8
 };
 
 // Delay Times for Three Stream 
-struct FDelayTimes
+struct FDelayTimesTthreeStream
 {
 	float Delay1;
 	float Delay2;
 	float Delay3;
 
-	FDelayTimes(float InDelay1, float InDelay2)
+	FDelayTimesTthreeStream(float InDelay1, float InDelay2)
 		: Delay1(InDelay1), Delay2(InDelay1), Delay3(0.0f) {}
 
-	FDelayTimes(float InDelay1, float InDelay2, float InDelay3)
+	FDelayTimesTthreeStream(float InDelay1, float InDelay2, float InDelay3)
 		: Delay1(InDelay1), Delay2(InDelay2), Delay3(InDelay3) {}
 };
 
@@ -206,6 +206,7 @@ inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContex
 				void UpdateOperation(FLatentResponse& Response) override
 				{
 					TotalTime += Response.ElapsedTime();
+
 					for (int32 i = 0; i < Delays.Num(); ++i)
 					{
 						if (TotalTime >= Delays[i] && InputsConditions[i] == InputsConditions[i])
@@ -215,6 +216,7 @@ inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContex
 							return;
 						}
 					}
+
 					Response.DoneIf(TotalTime > Delays.Last() + 1.0f); // Stop cooldown
 				}
 			};
