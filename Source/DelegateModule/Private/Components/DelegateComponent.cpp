@@ -30,6 +30,8 @@ UDelegateComponent::UDelegateComponent(const FObjectInitializer& ObjectInitializ
 
 	SummStaticTest.AddStatic(&SimpleRawClass::StaticSumm);
 
+
+	/* clang-format off */
 	UsualSumm.BindLambda([&](int a, int b, int& c)->void 
 		{
 			c = a + b;
@@ -44,6 +46,7 @@ UDelegateComponent::UDelegateComponent(const FObjectInitializer& ObjectInitializ
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Simpe Delegate Called"));
 		});
+	/* clang-format on */
 
 }
 

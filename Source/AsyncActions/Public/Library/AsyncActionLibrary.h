@@ -1,4 +1,4 @@
-// This is Sandbox Project. 
+// This is Sandbox Project.
 
 #pragma once
 
@@ -20,8 +20,7 @@ enum class EDelayedInputTwoStream : uint8
 	Execute UMETA(DisplayName = "Delay 0.5"),
 
 	/** Executes after a delay of 1 second. */
-	Delay1  UMETA(DisplayName = "Delay 1"),
-
+	Delay1 UMETA(DisplayName = "Delay 1"),
 };
 
 UENUM(BlueprintType)
@@ -45,10 +44,10 @@ enum class EDelayedInputThreeStream : uint8
 {
 	/** Executes after a delay of 0.5 seconds. */
 	Execute UMETA(DisplayName = "Delay 0.5"),
-	
+
 	/** Executes after a delay of 1 second. */
-	Delay1  UMETA(DisplayName = "Delay 1"),
-	
+	Delay1 UMETA(DisplayName = "Delay 1"),
+
 	/** Executes after a delay of 2 seconds. */
 	Delay2 UMETA(DisplayName = "Delay 2")
 };
@@ -64,7 +63,7 @@ enum class EDelayedExitsThreeStream : uint8
 {
 	/** Exits after 0.5 seconds. */
 	Then UMETA(DisplayName = "Exit 0.5"),
-	
+
 	/** Exits after 1 second. */
 	Exit1 UMETA(DisplayName = "Exit 1"),
 
@@ -72,18 +71,16 @@ enum class EDelayedExitsThreeStream : uint8
 	Exit2 UMETA(DisplayName = "Exit 2")
 };
 
-// Delay Times for Three Stream 
+// Delay Times for Three Stream
 struct FDelayTimesTthreeStream
 {
 	float Delay1;
 	float Delay2;
 	float Delay3;
 
-	FDelayTimesTthreeStream(float InDelay1, float InDelay2)
-		: Delay1(InDelay1), Delay2(InDelay1), Delay3(0.0f) {}
+	FDelayTimesTthreeStream(float InDelay1, float InDelay2) : Delay1(InDelay1), Delay2(InDelay1), Delay3(0.0f) {}
 
-	FDelayTimesTthreeStream(float InDelay1, float InDelay2, float InDelay3)
-		: Delay1(InDelay1), Delay2(InDelay2), Delay3(InDelay3) {}
+	FDelayTimesTthreeStream(float InDelay1, float InDelay2, float InDelay3) : Delay1(InDelay1), Delay2(InDelay2), Delay3(InDelay3) {}
 };
 
 struct FDelayTimesTwoStreams
@@ -91,8 +88,7 @@ struct FDelayTimesTwoStreams
 	float Delay1;
 	float Delay2;
 
-	FDelayTimesTwoStreams(const float InDelay1, const float InDelay2)
-		: Delay1(InDelay1), Delay2(InDelay2) {}
+	FDelayTimesTwoStreams(const float InDelay1, const float InDelay2) : Delay1(InDelay1), Delay2(InDelay2) {}
 };
 
 /**
@@ -107,9 +103,7 @@ class ASYNCACTIONS_API UAsyncActionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-
 public:
-	
 	/**
 	 * @brief Initiates a delayed sequence with three input and output streams.
 	 *
@@ -143,8 +137,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LatentActions|DelaySequence", meta = (ExpandEnumAsExecs = "Inputs, Outputs", Latent, LatentInfo = "LatentInfo", WorldContext = "WorldContextObject", KeyWords = "sleep"))
 	static void DelayedSequenceTwoStreams(UObject* WorldContextObject, EDelayedInputTwoStream Inputs, EDelayedExitsTwoStream& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1 = 0.5f, float CustomDelay2 = 1.0f);
 
-
-
 private:
 	/**
 	 * @brief Generalized delayed sequence handler for arbitrary streams.
@@ -159,11 +151,12 @@ private:
 	 * @param InputsConditions Array of input delay enums for the corresponding streams.
 	 * @param OutputsConditions Array of output enums to match the input conditions.
 	 */
-	template<typename InputEnum, typename OutputEnum>
-	static void GeneralizedDelayedSequence(UObject* WorldContextObject, FLatentActionInfo LatentInfo,const TArray<float>& DelayTimes,const TArray<InputEnum>& InputsConditions,OutputEnum& Outputs,const TArray<OutputEnum>& OutputsConditions);
+	template <typename InputEnum, typename OutputEnum>
+	static void GeneralizedDelayedSequence(
+		UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions);
 };
 
-template<typename InputEnum, typename OutputEnum>
+template <typename InputEnum, typename OutputEnum>
 inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions)
 {
 	if (UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject))
@@ -189,14 +182,9 @@ inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContex
 				FWeakObjectPtr CallbackTarget;
 
 			public:
-				FDelaySequenceAction(const FLatentActionInfo& LatentInfo,OutputEnum& InOutputs,const TArray<float>& InDelays,const TArray<InputEnum>& InInputsConditions,const TArray<OutputEnum>& InOutputsConditions)
-					: Outputs(InOutputs)
-					, Delays(InDelays)
-					, InputsConditions(InInputsConditions)
-					, OutputsConditions(InOutputsConditions)
-					, ExecutionFunction(LatentInfo.ExecutionFunction)
-					, OutputLink(LatentInfo.Linkage)
-					, CallbackTarget(LatentInfo.CallbackTarget)
+				FDelaySequenceAction(const FLatentActionInfo& LatentInfo, OutputEnum& InOutputs, const TArray<float>& InDelays, const TArray<InputEnum>& InInputsConditions, const TArray<OutputEnum>& InOutputsConditions)
+					: Outputs(InOutputs), Delays(InDelays), InputsConditions(InInputsConditions), OutputsConditions(InOutputsConditions), ExecutionFunction(LatentInfo.ExecutionFunction), OutputLink(LatentInfo.Linkage),
+					  CallbackTarget(LatentInfo.CallbackTarget)
 				{
 					// constructor logic
 				}
@@ -217,7 +205,7 @@ inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContex
 						}
 					}
 
-					Response.DoneIf(TotalTime > Delays.Last() + 1.0f); // Stop cooldown
+					Response.DoneIf(TotalTime > Delays.Last() + 1.0f);	// Stop cooldown
 				}
 			};
 

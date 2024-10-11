@@ -7,7 +7,7 @@ ColumnLimit: 240
 AccessModifierOffset: -4
 SortIncludes: false
 AllowShortBlocksOnASingleLine: false
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: Align
 AllowShortFunctionsOnASingleLine: Inline
 PointerAlignment: Left
 AllowShortIfStatementsOnASingleLine: true
@@ -16,3 +16,10 @@ AllowShortCaseLabelsOnASingleLine: true
 IndentCaseLabels: true
 AlwaysBreakTemplateDeclarations: Yes
 AlignEscapedNewlines: Left
+AllowShortLambdasOnASingleLine : true
+FixNamespaceComments : false
+NamespaceIndentation : All
+SpaceAfterCStyleCast : true
+SpaceAfterLogicalNot : true
+SpaceBeforeJsonColon : true
+SpacesInContainerLiterals : true
