@@ -154,9 +154,8 @@ private:
 	template <typename InputEnum, typename OutputEnum>
 	static void GeneralizedDelayedSequence(UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions);
 };
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // TODO !!! надо доделать, ноды не работают так как до рефакторинга... Ошибка где то в шаблоне ....
-
 template <typename InputEnum, typename OutputEnum>
 inline void UAsyncActionLibrary::GeneralizedDelayedSequence(UObject* WorldContextObject, FLatentActionInfo LatentInfo, const TArray<float>& DelayTimes, const TArray<InputEnum>& InputsConditions, OutputEnum& Outputs, const TArray<OutputEnum>& OutputsConditions)
 {

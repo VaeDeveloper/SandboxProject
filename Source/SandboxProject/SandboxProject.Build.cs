@@ -19,7 +19,8 @@ public class SandboxProject : ModuleRules
             "LocalizationCommandletExecution",
             "GameplayTags",
 			"DelegateModule",
-			"ThreadsModule"
+			"ThreadsModule",
+			"DataRegistry"
 		});
 	}
 }
