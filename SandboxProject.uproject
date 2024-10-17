@@ -43,6 +43,11 @@
 			"AdditionalDependencies": [
 				"Engine"
 			]
+		},
+		{
+			"name": "NativeDebugModule",
+			"type": "Runtime",
+			"loadingPhase": "Default"
 		}
 	],
 	"Plugins": [
