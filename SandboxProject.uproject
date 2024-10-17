@@ -45,9 +45,12 @@
 			]
 		},
 		{
-			"name": "NativeDebugModule",
-			"type": "Runtime",
-			"loadingPhase": "Default"
+			"Name": "NativeDebugModule",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
