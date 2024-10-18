@@ -52,26 +52,185 @@ enum ELogVerbosityEx
 	VeryVerbose = 7
 };
 
+/**
+ * A helper class for extended debug functionalities, primarily for drawing various types of traces in the Unreal Engine world.
+ */
 class FExtendedDebugtHelpers : public UObject
 {
 public:
+	/**
+	 * Configures collision query parameters.
+	 *
+	 * @param TraceTag The tag to use for the trace.
+	 * @param bTraceComplex Whether to trace complex geometry.
+	 * @param ActorsToIgnore Array of actors to be ignored during the trace.
+	 * @param bIgnoreSelf Whether to ignore the actor calling the function.
+	 * @param WorldContextObject Context object for the world in which the trace is performed.
+	 * @return Configured collision query parameters.
+	 */
 	static FCollisionQueryParams ConfigureCollisionParamsEx(FName TraceTag, bool bTraceComplex, const TArray<AActor*>& ActorsToIgnore, bool bIgnoreSelf, const UObject* WorldContextObject);
+	
+	/**
+	 * Configures collision object query parameters based on specified object types.
+	 *
+	 * @param ObjectTypes Array of object types to include in the query.
+	 * @return Configured collision object query parameters.
+	 */
 	static FCollisionObjectQueryParams ConfigureCollisionObjectParamsEx(const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes);
 
+	/**
+	 * Draws a debug line for a single trace.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug line.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResult Details of the hit result.
+	 * @param TraceColor Color of the trace line.
+	 * @param TraceHitColor Color of the trace line when hitting something.
+	 * @param Thickness Thickness of the trace line.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugLineTraceSingleEx(const UWorld* World, const FVector& Start, const FVector& End, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const FHitResult& HitResult, FLinearColor TraceColor, FLinearColor TraceHitColor, float Thickness,
 										   float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug line for multiple traces.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug line.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResults Array of hit results.
+	 * @param TraceColor Color of the trace line.
+	 * @param TraceHitColor Color of the trace line when hitting something.
+	 * @param Thickness Thickness of the trace line.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugLineTraceMultiEx(const UWorld* World, const FVector& Start, const FVector& End, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const TArray<FHitResult>& HitResults, FLinearColor TraceColor, FLinearColor TraceHitColor, float Thickness,
 										  float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug box for a single trace.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param HalfSize Half size of the box.
+	 * @param Orientation Orientation of the box.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug box.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResult Details of the hit result.
+	 * @param TraceColor Color of the box.
+	 * @param TraceHitColor Color of the box when hitting something.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugBoxTraceSingleEx(const UWorld* World, const FVector& Start, const FVector& End, const FVector& HalfSize, const FRotator& Orientation, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const FHitResult& HitResult, FLinearColor TraceColor,
 										  FLinearColor TraceHitColor, float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug box for multiple traces.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param HalfSize Half size of the box.
+	 * @param Orientation Orientation of the box.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug box.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResults Array of hit results.
+	 * @param TraceColor Color of the box.
+	 * @param TraceHitColor Color of the box when hitting something.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugBoxTraceMultiEx(const UWorld* World, const FVector& Start, const FVector& End, const FVector& HalfSize, const FRotator& Orientation, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const TArray<FHitResult>& HitResults,
 										 FLinearColor TraceColor, FLinearColor TraceHitColor, float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug sphere for a single trace.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param Radius Radius of the sphere.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug sphere.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResult Details of the hit result.
+	 * @param TraceColor Color of the sphere.
+	 * @param TraceHitColor Color of the sphere when hitting something.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugSphereTraceSingleEx(const UWorld* World, const FVector& Start, const FVector& End, float Radius, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const FHitResult& HitResult, FLinearColor TraceColor, FLinearColor TraceHitColor,
 											 float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug sphere for multiple traces.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param Radius Radius of the sphere.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug sphere.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResults Array of hit results.
+	 * @param TraceColor Color of the sphere.
+	 * @param TraceHitColor Color of the sphere when hitting something.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugSphereTraceMultiEx(const UWorld* World, const FVector& Start, const FVector& End, float Radius, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const TArray<FHitResult>& HitResults, FLinearColor TraceColor, FLinearColor TraceHitColor,
 											float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug capsule for a single trace.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param Radius Radius of the capsule.
+	 * @param HalfHeight Half height of the capsule.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug capsule.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResult Details of the hit result.
+	 * @param TraceColor Color of the capsule.
+	 * @param TraceHitColor Color of the capsule when hitting something.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugCapsuleTraceSingleEx(const UWorld* World, const FVector& Start, const FVector& End, float Radius, float HalfHeight, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const FHitResult& HitResult, FLinearColor TraceColor,
 											  FLinearColor TraceHitColor, float PointSize, float DrawTime);
+	
+	/**
+	 * Draws a debug capsule for multiple traces.
+	 *
+	 * @param World The world context.
+	 * @param Start Starting point of the trace.
+	 * @param End Ending point of the trace.
+	 * @param Radius Radius of the capsule.
+	 * @param HalfHeight Half height of the capsule.
+	 * @param DrawDebugType Type of debug drawing.
+	 * @param DepthPriority Depth priority of the debug capsule.
+	 * @param bHit Whether the trace hit something.
+	 * @param HitResults Array of hit results.
+	 * @param TraceColor Color of the capsule.
+	 * @param TraceHitColor Color of the capsule when hitting something.
+	 * @param PointSize Size of the points drawn.
+	 * @param DrawTime Duration for which the trace is drawn.
+	 */
 	static void DrawDebugCapsuleTraceMultiEx(const UWorld* World, const FVector& Start, const FVector& End, float Radius, float HalfHeight, EDrawDebugTrace::Type DrawDebugType, ESceneDepthPriority DepthPriority, bool bHit, const TArray<FHitResult>& HitResults, FLinearColor TraceColor,
 											 FLinearColor TraceHitColor, float PointSize, float DrawTime);
 };
