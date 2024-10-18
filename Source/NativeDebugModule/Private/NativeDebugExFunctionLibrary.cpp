@@ -31,6 +31,12 @@
 #endif
 #include "PhysicsEngine/PhysicsSettings.h"
 
+inline void ConfigureDrawDebugParams(EDrawDebugTrace::Type DrawDebugType, bool& bPersistent, float& LifeTime, float DrawTime)
+{
+	bPersistent = (DrawDebugType == EDrawDebugTrace::Persistent);
+	LifeTime = (DrawDebugType == EDrawDebugTrace::ForDuration) ? DrawTime : 0.f;
+}
+
 FCollisionQueryParams FExtendedDebugtHelpers::ConfigureCollisionParamsEx(FName TraceTag, bool bTraceComplex, const TArray<AActor*>& ActorsToIgnore, bool bIgnoreSelf, const UObject* WorldContextObject)
 {
 	FCollisionQueryParams Params(TraceTag, SCENE_QUERY_STAT_ONLY(KismetTraceUtils), bTraceComplex);
@@ -48,6 +54,7 @@ FCollisionQueryParams FExtendedDebugtHelpers::ConfigureCollisionParamsEx(FName T
 		{
 			// Find owner
 			const UObject* CurrentObject = WorldContextObject;
+
 			while (CurrentObject)
 			{
 				CurrentObject = CurrentObject->GetOuter();
@@ -67,25 +74,18 @@ FCollisionQueryParams FExtendedDebugtHelpers::ConfigureCollisionParamsEx(FName T
 
 FCollisionObjectQueryParams FExtendedDebugtHelpers::ConfigureCollisionObjectParamsEx(const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes)
 {
-	TArray<TEnumAsByte<ECollisionChannel>> CollisionObjectTraces;
-	CollisionObjectTraces.AddUninitialized(ObjectTypes.Num());
-
-	for (auto Iter = ObjectTypes.CreateConstIterator(); Iter; ++Iter)
-	{
-		CollisionObjectTraces[Iter.GetIndex()] = UEngineTypes::ConvertToCollisionChannel(*Iter);
-	}
-
 	FCollisionObjectQueryParams ObjectParams;
-	for (auto Iter = CollisionObjectTraces.CreateConstIterator(); Iter; ++Iter)
+
+	for (const auto& ObjectType : ObjectTypes)
 	{
-		const ECollisionChannel& Channel = (*Iter);
+		ECollisionChannel Channel = UEngineTypes::ConvertToCollisionChannel(ObjectType);
 		if (FCollisionObjectQueryParams::IsValidObjectQuery(Channel))
 		{
 			ObjectParams.AddObjectTypesToQuery(Channel);
 		}
 		else
 		{
-			UE_LOG(LogBlueprintUserMessages, Warning, TEXT("%d isn't valid object type"), (int32) Channel);
+			UE_LOG(LogBlueprintUserMessages, Warning, TEXT("%d isn't valid object type"), static_cast<int32>(Channel));
 		}
 	}
 
@@ -183,7 +183,7 @@ void FExtendedDebugtHelpers::DrawDebugBoxTraceMultiEx(const UWorld* World, const
 		for (int32 HitIdx = 0; HitIdx < HitResults.Num(); ++HitIdx)
 		{
 			FHitResult const& Hit = HitResults[HitIdx];
-			DrawDebugPoint(World, Hit.ImpactPoint, PointSize, (Hit.bBlockingHit ? TraceColor.ToFColor(true) : TraceHitColor.ToFColor(true)), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
+			DrawDebugPoint(World, Hit.ImpactPoint, PointSize, (Hit.bBlockingHit ? TraceColor.ToFColor(true) : TraceHitColor.ToFColor(true)), bPersistent, LifeTime, DepthPriority);
 		}
 	}
 }
@@ -274,24 +274,24 @@ void FExtendedDebugtHelpers::DrawDebugCapsuleTraceMultiEx(const UWorld* World, c
 		if (bHit && HitResults.Last().bBlockingHit)
 		{
 			FVector const BlockingHitPoint = HitResults.Last().Location;
-			DrawDebugCapsule(World, Start, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
-			DrawDebugCapsule(World, BlockingHitPoint, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
-			DrawDebugLine(World, Start, BlockingHitPoint, TraceColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
+			DrawDebugCapsule(World, Start, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
+			DrawDebugCapsule(World, BlockingHitPoint, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
+			DrawDebugLine(World, Start, BlockingHitPoint, TraceColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
 
-			DrawDebugCapsule(World, End, HalfHeight, Radius, FQuat::Identity, TraceHitColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
-			DrawDebugLine(World, BlockingHitPoint, End, TraceHitColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
+			DrawDebugCapsule(World, End, HalfHeight, Radius, FQuat::Identity, TraceHitColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
+			DrawDebugLine(World, BlockingHitPoint, End, TraceHitColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
 		}
 		else
 		{
-			DrawDebugCapsule(World, Start, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
-			DrawDebugCapsule(World, End, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
-			DrawDebugLine(World, Start, End, TraceColor.ToFColor(true), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
+			DrawDebugCapsule(World, Start, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
+			DrawDebugCapsule(World, End, HalfHeight, Radius, FQuat::Identity, TraceColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
+			DrawDebugLine(World, Start, End, TraceColor.ToFColor(true), bPersistent, LifeTime, DepthPriority);
 		}
 
 		for (int32 HitIdx = 0; HitIdx < HitResults.Num(); ++HitIdx)
 		{
 			FHitResult const& Hit = HitResults[HitIdx];
-			DrawDebugPoint(World, Hit.ImpactPoint, PointSize, (Hit.bBlockingHit ? TraceColor.ToFColor(true) : TraceHitColor.ToFColor(true)), bPersistent, LifeTime, static_cast<uint8>(DepthPriority));
+			DrawDebugPoint(World, Hit.ImpactPoint, PointSize, (Hit.bBlockingHit ? TraceColor.ToFColor(true) : TraceHitColor.ToFColor(true)), bPersistent, LifeTime, DepthPriority);
 		}
 	}
 }
