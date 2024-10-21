@@ -31,10 +31,16 @@
 #endif
 #include "PhysicsEngine/PhysicsSettings.h"
 
-inline void ConfigureDrawDebugParams(EDrawDebugTrace::Type DrawDebugType, bool& bPersistent, float& LifeTime, float DrawTime)
+namespace DebugConfig
 {
-	bPersistent = (DrawDebugType == EDrawDebugTrace::Persistent);
-	LifeTime = (DrawDebugType == EDrawDebugTrace::ForDuration) ? DrawTime : 0.f;
+	/**
+	 * Configuration Params for Debug type, Persistent, Lifetime, DrawTime
+	 */
+	inline void ConfigureDrawDebugParams(EDrawDebugTrace::Type DrawDebugType, bool& bPersistent, float& LifeTime, float DrawTime)
+	{
+		bPersistent = (DrawDebugType == EDrawDebugTrace::Persistent);
+		LifeTime = (DrawDebugType == EDrawDebugTrace::ForDuration) ? DrawTime : 0.f;
+	}
 }
 
 FCollisionQueryParams FExtendedDebugtHelpers::ConfigureCollisionParamsEx(FName TraceTag, bool bTraceComplex, const TArray<AActor*>& ActorsToIgnore, bool bIgnoreSelf, const UObject* WorldContextObject)
@@ -296,11 +302,6 @@ void FExtendedDebugtHelpers::DrawDebugCapsuleTraceMultiEx(const UWorld* World, c
 	}
 }
 
-
-
-
-
-
 void UNativeDebugExFunctionLibrary::DrawDebugPointEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Location, float Size, FLinearColor DebugColor, ESceneDepthPriority DepthPriority, bool bIsPersistent, float Duration)
 {
 #if ENABLE_DRAW_DEBUG
@@ -333,7 +334,7 @@ void UNativeDebugExFunctionLibrary::DrawDebugLineEx(const UObject* WorldContextO
 }
 
 void UNativeDebugExFunctionLibrary::DrawDebugCircleEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Center, float Radius, int32 Segments, FLinearColor DebugColor, FVector YAxis, FVector ZAxis, bool bDrawAxis, ESceneDepthPriority DepthPriority, bool bIsPersistent,
-											  float Duration, float Thickness)
+													  float Duration, float Thickness)
 {
 #if ENABLE_DRAW_DEBUG
 	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull); World != nullptr)
@@ -433,7 +434,7 @@ void UNativeDebugExFunctionLibrary::DrawDebugCylinderEx(const UObject* WorldCont
 }
 
 void UNativeDebugExFunctionLibrary::DrawDebugConeInDegreesEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Origin, FVector Direction, float Length, float AngleWidth, float AngleHeight, int32 Segments, FLinearColor DebugColor, ESceneDepthPriority DepthPriority,
-													 bool bIsPersistent, float Duration, float Thickness)
+															 bool bIsPersistent, float Duration, float Thickness)
 {
 #if ENABLE_DRAW_DEBUG
 	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull); World != nullptr)
@@ -500,7 +501,7 @@ void UNativeDebugExFunctionLibrary::DrawDebugCameraEx(const ACameraActor* Camera
 }
 
 void UNativeDebugExFunctionLibrary::DrawDebugFloatHistoryTransformEx(const UObject* WorldContextObject, const FTransform WorldTransform, const FDebugFloatHistory& FloatHistory, FTransform Transform, FVector2D DrawSize, FLinearColor DebugColor, ESceneDepthPriority DepthPriority, bool bIsPersistent,
-															 float Duration)
+																	 float Duration)
 {
 #if ENABLE_DRAW_DEBUG
 	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull); World != nullptr)
@@ -517,7 +518,7 @@ void UNativeDebugExFunctionLibrary::DrawDebugFloatHistoryTransformEx(const UObje
 }
 
 void UNativeDebugExFunctionLibrary::DrawDebugFloatHistoryLocationEx(const UObject* WorldContextObject, const FTransform WorldTransform, const FDebugFloatHistory& FloatHistory, FVector Location, FVector2D DrawSize, FLinearColor DebugColor, ESceneDepthPriority DepthPriority, bool bIsPersistent,
-															float Duration)
+																	float Duration)
 {
 #if ENABLE_DRAW_DEBUG
 	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull); World != nullptr)
@@ -574,7 +575,7 @@ void UNativeDebugExFunctionLibrary::DrawDebugMesh(const UObject* WorldContextObj
 // START OF NEW TRACING METHODS
 
 bool UNativeDebugExFunctionLibrary::LineTraceSingleEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore,
-											  FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
+													  FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -598,7 +599,7 @@ bool UNativeDebugExFunctionLibrary::LineTraceSingleEx(const UObject* WorldContex
 }
 
 bool UNativeDebugExFunctionLibrary::LineTraceSingleByProfile(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore,
-													 FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
+															 FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -620,7 +621,7 @@ bool UNativeDebugExFunctionLibrary::LineTraceSingleByProfile(const UObject* Worl
 }
 
 bool UNativeDebugExFunctionLibrary::LineTraceSingleForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, bool bTraceComplex, bool bIgnoreSelf, const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes, EDrawDebugTrace::Type DrawDebugType,
-														const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
+																const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -649,7 +650,7 @@ bool UNativeDebugExFunctionLibrary::LineTraceSingleForObjectsEx(const UObject* W
 }
 
 bool UNativeDebugExFunctionLibrary::LineTraceMulti(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore,
-										   TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
+												   TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -673,7 +674,7 @@ bool UNativeDebugExFunctionLibrary::LineTraceMulti(const UObject* WorldContextOb
 }
 
 bool UNativeDebugExFunctionLibrary::LineTraceMultiByProfile(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore,
-													TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
+															TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -695,7 +696,7 @@ bool UNativeDebugExFunctionLibrary::LineTraceMultiByProfile(const UObject* World
 }
 
 bool UNativeDebugExFunctionLibrary::LineTraceMultiForObjects(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, bool bTraceComplex, bool bIgnoreSelf, EDrawDebugTrace::Type DrawDebugType, const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-													 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
+															 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TraceThickness, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -724,8 +725,7 @@ bool UNativeDebugExFunctionLibrary::LineTraceMultiForObjects(const UObject* Worl
 }
 
 bool UNativeDebugExFunctionLibrary::BoxTraceSingleEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, const FVector HalfSize, const FRotator Orientation, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel,
-													 EDrawDebugTrace::Type DrawDebugType,
-											 const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+													 EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -747,8 +747,7 @@ bool UNativeDebugExFunctionLibrary::BoxTraceSingleEx(const UObject* WorldContext
 }
 
 bool UNativeDebugExFunctionLibrary::BoxTraceSingleByProfileEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, const FVector HalfSize, const FRotator Orientation, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName,
-															  EDrawDebugTrace::Type DrawDebugType,
-													  const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+															  EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -771,8 +770,8 @@ bool UNativeDebugExFunctionLibrary::BoxTraceSingleByProfileEx(const UObject* Wor
 }
 
 bool UNativeDebugExFunctionLibrary::BoxTraceSingleForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, const FVector HalfSize, const FRotator Orientation, bool bTraceComplex, bool bIgnoreSelf,
-															   const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-													   EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+															   const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes, EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor,
+															   FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -804,7 +803,7 @@ bool UNativeDebugExFunctionLibrary::BoxTraceSingleForObjectsEx(const UObject* Wo
 }
 
 bool UNativeDebugExFunctionLibrary::BoxTraceMultiEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, FVector HalfSize, const FRotator Orientation, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType,
-											const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+													const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -826,7 +825,7 @@ bool UNativeDebugExFunctionLibrary::BoxTraceMultiEx(const UObject* WorldContextO
 }
 
 bool UNativeDebugExFunctionLibrary::BoxTraceMultiByProfileEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, FVector HalfSize, const FRotator Orientation, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType,
-													 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+															 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -848,8 +847,8 @@ bool UNativeDebugExFunctionLibrary::BoxTraceMultiByProfileEx(const UObject* Worl
 }
 
 bool UNativeDebugExFunctionLibrary::BoxTraceMultiForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, const FVector HalfSize, const FRotator Orientation, bool bTraceComplex, bool bIgnoreSelf,
-															  const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-													  EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+															  const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes, EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor,
+															  FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -878,7 +877,7 @@ bool UNativeDebugExFunctionLibrary::BoxTraceMultiForObjectsEx(const UObject* Wor
 }
 
 bool UNativeDebugExFunctionLibrary::SphereTraceSingleEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType,
-												const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+														const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -902,8 +901,7 @@ bool UNativeDebugExFunctionLibrary::SphereTraceSingleEx(const UObject* WorldCont
 }
 
 bool UNativeDebugExFunctionLibrary::SphereTraceSingleByProfileEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType,
-																 const TArray<AActor*>& ActorsToIgnore,
-														 FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																 const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -925,8 +923,7 @@ bool UNativeDebugExFunctionLibrary::SphereTraceSingleByProfileEx(const UObject* 
 }
 
 bool UNativeDebugExFunctionLibrary::SphereTraceSingleForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, bool bTraceComplex, bool bIgnoreSelf, const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-																  EDrawDebugTrace::Type DrawDebugType,
-														  const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																  EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -955,8 +952,7 @@ bool UNativeDebugExFunctionLibrary::SphereTraceSingleForObjectsEx(const UObject*
 }
 
 bool UNativeDebugExFunctionLibrary::SphereTraceMultiEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType,
-													   const TArray<AActor*>& ActorsToIgnore,
-											   TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+													   const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -980,8 +976,7 @@ bool UNativeDebugExFunctionLibrary::SphereTraceMultiEx(const UObject* WorldConte
 }
 
 bool UNativeDebugExFunctionLibrary::SphereTraceMultiByProfileEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType,
-																const TArray<AActor*>& ActorsToIgnore,
-														TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1003,8 +998,8 @@ bool UNativeDebugExFunctionLibrary::SphereTraceMultiByProfileEx(const UObject* W
 }
 
 bool UNativeDebugExFunctionLibrary::SphereTraceMultiForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, bool bTraceComplex, bool bIgnoreSelf, const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-																 EDrawDebugTrace::Type DrawDebugType,
-														 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																 EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize,
+																 float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1033,7 +1028,7 @@ bool UNativeDebugExFunctionLibrary::SphereTraceMultiForObjectsEx(const UObject* 
 }
 
 bool UNativeDebugExFunctionLibrary::CapsuleTraceSingleEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, float HalfHeight, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType,
-												 const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+														 const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1057,7 +1052,7 @@ bool UNativeDebugExFunctionLibrary::CapsuleTraceSingleEx(const UObject* WorldCon
 }
 
 bool UNativeDebugExFunctionLibrary::CapsuleTraceSingleByProfileEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, float HalfHeight, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType,
-														  const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																  const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1079,7 +1074,8 @@ bool UNativeDebugExFunctionLibrary::CapsuleTraceSingleByProfileEx(const UObject*
 }
 
 bool UNativeDebugExFunctionLibrary::CapsuleTraceSingleForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, float HalfHeight, bool bTraceComplex, bool bIgnoreSelf, const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-														   EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																   EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, FHitResult& HitResult, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize,
+																   float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1108,7 +1104,7 @@ bool UNativeDebugExFunctionLibrary::CapsuleTraceSingleForObjectsEx(const UObject
 }
 
 bool UNativeDebugExFunctionLibrary::CapsuleTraceMultiEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, float HalfHeight, bool bTraceComplex, bool bIgnoreSelf, ETraceTypeQuery TraceChannel, EDrawDebugTrace::Type DrawDebugType,
-												const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+														const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1132,7 +1128,7 @@ bool UNativeDebugExFunctionLibrary::CapsuleTraceMultiEx(const UObject* WorldCont
 }
 
 bool UNativeDebugExFunctionLibrary::CapsuleTraceMultiByProfileEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, float HalfHeight, bool bTraceComplex, bool bIgnoreSelf, FName ProfileName, EDrawDebugTrace::Type DrawDebugType,
-														 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
+																 const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize, float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1154,8 +1150,8 @@ bool UNativeDebugExFunctionLibrary::CapsuleTraceMultiByProfileEx(const UObject* 
 }
 
 bool UNativeDebugExFunctionLibrary::CapsuleTraceMultiForObjectsEx(const UObject* WorldContextObject, const FTransform WorldTransform, FVector Start, FVector End, float Radius, float HalfHeight, bool bTraceComplex, bool bIgnoreSelf, const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
-														  EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize,
-														  float TraceDrawTime)
+																  EDrawDebugTrace::Type DrawDebugType, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& HitResults, ESceneDepthPriority TraceDepthPriority, FLinearColor TraceColor, FLinearColor TraceHitColor, float TracePointSize,
+																  float TraceDrawTime)
 {
 	if (! WorldTransform.EqualsNoScale(FTransform::Identity))
 	{
@@ -1370,12 +1366,3 @@ void UNativeDebugExFunctionLibrary::PrintStringEx(const UObject* WorldContextObj
 	}
 #endif
 }
-
-
-
-
-
-
-
-
-
