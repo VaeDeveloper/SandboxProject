@@ -1,4 +1,4 @@
-// This is Sandbox Project. 
+// This is Sandbox Project.
 
 #pragma once
 
@@ -8,32 +8,95 @@
 #include "Components/TextRenderComponent.h"
 #include "LDPathLengthActor.generated.h"
 
-UCLASS(meta = (PrioritizeCategories = "Settings"))
+class USplineMeshComponent;
+
+/**
+ *	Enum representing the world value types for length measurement.
+ */
+UENUM(BlueprintType)
+enum ELengthWolrdValue : uint8
+{
+	/** Measurement in meters */
+	ELWV_Meters UMETA(DisplayName = "Meters"),
+
+	/** Measurement in centimeters */
+	ELWV_Cent	UMETA(DisplayName = "Centimeters"),
+};
+
+/**
+ *  AActor subclass that represents a spline with text-based length visulaization spline mesh component
+ */
+UCLASS(Blueprintable, meta = (PrioritizeCategories = "Settings"))
 class SANDBOXPROJECT_API ALDPathLengthActor : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ALDPathLengthActor();
 
-protected:
+public:
+	/**
+	 * Default constructor. Initializes components and sets default values.
+	 * @param ObjectInitializer - Provides initialization parameters for the actor.
+	 */
+	ALDPathLengthActor(const FObjectInitializer& ObjectInitializer);
+
+	/**
+	 * Called when an actor is constructed in the editor.
+	 * @param Transform - The transform of the actor.
+	 */
+	virtual void OnConstruction(const FTransform& Transform) override;
 	
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Settings")
+protected:
+	/** The spline component that defines the path. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Settings")
 	TObjectPtr<USplineComponent> SplineComp;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Settings")
+	/** The text render component that displays the spline's length. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Settings")
 	TObjectPtr<UTextRenderComponent> TextRender;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	float SplineLength = 0.0f;
+	/** Enum value representing the unit of length (meters or centimeters). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TEnumAsByte<ELengthWolrdValue> WorldValue = ELengthWolrdValue::ELWV_Meters;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	bool bIsM = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
+	/** Size of the text in the TextRender component. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
 	float TextRenderSize = 50.0f;
-	
 
+	/** spline mesh scale value */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "0.06", ClampMax = "2"))
+	float SplineMeshScale = 1.0f;
+
+	/** Color used in the material applied to the spline mesh. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
+	FLinearColor MaterialColor;
+
+	/** Base material instance used for dynamic material creation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
+	TObjectPtr<UMaterialInterface> MaterialInstance;
+
+	/** Name of the material parameter to be set dynamically. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
+	FName MaterialParameterName = FName("");
+
+	/** Static mesh used for spline mesh components. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
+	TObjectPtr<UStaticMesh> SplineMeshForComponent;
+
+private:
+	/**
+	 * Updates the text render component with the current spline length based on the selected unit.
+	 */
+	void SetTextParams();
+
+    /**
+	 * Constructs spline mesh components along the spline.
+	 */
+	void ConstructSplineMeshComponent();
+
+	/** Array holding references to dynamically created spline mesh components. */
+	UPROPERTY()
+	TArray<TObjectPtr<USplineMeshComponent>> SplineMeshComponents;
+
+	/** Cached spline length in Unreal units (centimeters). */
+	float SplineLength = 0.0f;
 
 };
