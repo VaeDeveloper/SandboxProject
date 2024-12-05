@@ -20,6 +20,9 @@ void UAsyncActionLibrary::DelayedSequenceThreeStreams(UObject* WorldContextObjec
 	GeneralizedDelayedSequence<EDelayedInputThreeStream, EDelayedExitsThreeStream>(WorldContextObject, LatentInfo, Delays, InputConditions, Outputs, OutputConditions);
 }
 
+/**
+ * @brief 
+ */
 void UAsyncActionLibrary::DelayedSequenceTwoStreams(UObject* WorldContextObject, EDelayedInputTwoStream Inputs, EDelayedExitsTwoStream& Outputs, FLatentActionInfo LatentInfo, float CustomDelay1, float CustomDelay2)
 {
 	TArray<float> Delays = {CustomDelay1, CustomDelay2};

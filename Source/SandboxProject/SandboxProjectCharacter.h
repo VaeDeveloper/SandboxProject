@@ -14,7 +14,9 @@ class UInputAction;
 class UInputMappingContext;
 class UDelegateComponent;
 class UThreadComponent;
+class UTagComponent;
 struct FInputActionValue;
+
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -37,7 +39,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerCharacter|LevelActors")
 	TArray<TSoftObjectPtr<AActor>> LevelActors;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* LookAction;
 
 protected:
@@ -57,7 +59,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerCharacter|Thread")
 	TObjectPtr<UThreadComponent> ThreadComponent;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerCharacter|TagsComponent")
+	TObjectPtr<UTagComponent> TagsComponent;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerCharacter|Thread")
 	int32 TotalActors = 10; 
 

@@ -20,7 +20,8 @@ public class SandboxProject : ModuleRules
             "GameplayTags",
 			"DelegateModule",
 			"ThreadsModule",
-			"DataRegistry"
+			"DataRegistry",
+			"TagsModule"
 		});
 	}
 }

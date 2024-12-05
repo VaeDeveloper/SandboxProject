@@ -20,13 +20,13 @@ enum ELengthWolrdValue : uint8
 	ELWV_Meters UMETA(DisplayName = "Meters"),
 
 	/** Measurement in centimeters */
-	ELWV_Cent	UMETA(DisplayName = "Centimeters"),
+	ELWV_Cent UMETA(DisplayName = "Centimeters"),
 };
 
 /**
  *  AActor subclass that represents a spline with text-based length visulaization spline mesh component
  */
-UCLASS(Blueprintable, meta = (PrioritizeCategories = "Settings"))
+UCLASS(meta = (PrioritizeCategories = "Settings"))
 class SANDBOXPROJECT_API ALDPathLengthActor : public AActor
 {
 	GENERATED_BODY()
@@ -43,7 +43,13 @@ public:
 	 * @param Transform - The transform of the actor.
 	 */
 	virtual void OnConstruction(const FTransform& Transform) override;
-	
+
+#if WITH_EDITOR
+
+	// virtual void PostEditUndo() override;
+	virtual bool Modify(bool bAlwaysMarkDirty = true) override;
+#endif
+
 protected:
 	/** The spline component that defines the path. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Settings")
@@ -82,15 +88,20 @@ protected:
 	TObjectPtr<UStaticMesh> SplineMeshForComponent;
 
 private:
+	//UPROPERTY()
+	//TObjectPtr<USplineMeshComponent> SplineMeshComponent;
+
 	/**
 	 * Updates the text render component with the current spline length based on the selected unit.
 	 */
 	void SetTextParams();
 
-    /**
+	/**
 	 * Constructs spline mesh components along the spline.
 	 */
-	void ConstructSplineMeshComponent();
+	void ConstructSplineMeshComponent(const FTransform& SplineTransform);
+
+	void SetInstanceMaterialAndParams(USplineMeshComponent* SplineMesh);
 
 	/** Array holding references to dynamically created spline mesh components. */
 	UPROPERTY()
@@ -98,5 +109,4 @@ private:
 
 	/** Cached spline length in Unreal units (centimeters). */
 	float SplineLength = 0.0f;
-
 };

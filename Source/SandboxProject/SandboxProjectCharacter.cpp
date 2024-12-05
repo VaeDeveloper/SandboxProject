@@ -12,6 +12,7 @@
 #include "Engine/LocalPlayer.h"
 #include "DelegateModule/Public/Components/DelegateComponent.h"
 #include "ThreadsModule/Components/ThreadComponent.h"
+#include "TagsModule/Public/TagComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -44,14 +45,18 @@ ASandboxProjectCharacter::ASandboxProjectCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
 
 	DelegateComponent = CreateOptionalDefaultSubobject<UDelegateComponent>(TEXT("DelegateComponent"));
 	check(DelegateComponent);
 	
 	ThreadComponent = CreateOptionalDefaultSubobject<UThreadComponent>(TEXT("ThreadComponent"));
 	check(ThreadComponent);
+
+	TagsComponent = CreateDefaultSubobject<UTagComponent>(TEXT("TagsComponent"));
+	check(TagsComponent);
+
 
 	TestDelegateBind();
 }

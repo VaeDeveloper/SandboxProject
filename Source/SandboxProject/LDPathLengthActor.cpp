@@ -3,7 +3,7 @@
 #include "LDPathLengthActor.h"
 #include "Components/SplineMeshComponent.h"
 
-
+DEFINE_LOG_CATEGORY_STATIC(SplineActorLevelDesign, All, All)
 
 /**
  * Default constructor. Sets default values for the actor's properties and initializes components.
@@ -13,10 +13,9 @@ ALDPathLengthActor::ALDPathLengthActor(const FObjectInitializer& ObjectInitializ
 	PrimaryActorTick.bCanEverTick = false;
 
 	SplineComp = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
-	check(SplineComp);
+	SetRootComponent(SplineComp);
 
 	TextRender = CreateDefaultSubobject<UTextRenderComponent>(TEXT("TextRender"));
-	check(TextRender);
 	TextRender->SetRelativeRotation(FRotator(0.0, 90.0, 0.0));
 	TextRender->SetupAttachment(SplineComp);
 }
@@ -26,9 +25,33 @@ ALDPathLengthActor::ALDPathLengthActor(const FObjectInitializer& ObjectInitializ
  */
 void ALDPathLengthActor::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
+
 	SetTextParams();
-	ConstructSplineMeshComponent();
+	ConstructSplineMeshComponent(Transform);
 }
+
+bool ALDPathLengthActor::Modify(bool bAlwaysMarkDirty)
+{
+	UE_LOG(SplineActorLevelDesign, Error, TEXT("=======Modify======="));
+	return Super::Modify(bAlwaysMarkDirty);
+}
+
+//void ALDPathLengthActor::PostEditUndo() 
+//{
+//	Super::PostEditUndo();
+//	UE_LOG(SplineActorLevelDesign, Warning, TEXT("=======PostEditUndo======= "));
+//}
+
+//bool ALDPathLengthActor::Modify(bool bAlwaysMarkDirty)
+//{
+//	return Super::Modify(bAlwaysMarkDirty);
+//
+//	UE_LOG(SplineActorLevelDesign, Warning, TEXT("=======Modify======= "));
+//}
+
+
+
 
 /**
  * Updates the text render component based on the spline's length and selected measurement unit.
@@ -65,26 +88,51 @@ void ALDPathLengthActor::SetTextParams()
 /**
  * Constructs spline mesh components along the spline and applies dynamic materials.
  */
-void ALDPathLengthActor::ConstructSplineMeshComponent()
+void ALDPathLengthActor::ConstructSplineMeshComponent(const FTransform& SplineTransform)
 {
-	// Destroy existing spline mesh components.
-	for (USplineMeshComponent* SplineMesh : SplineMeshComponents)
+	(void) SplineTransform;
+
+	for (auto SMeshComponent : SplineMeshComponents)
 	{
-		if (! SplineMesh) continue;
-		
-		SplineMesh->DestroyComponent();
-		
+		if (IsValid(SMeshComponent))
+		{
+			UE_LOG(SplineActorLevelDesign, Warning, TEXT("Removing component: %s"), *SMeshComponent->GetName());
+			SMeshComponent->UnregisterComponent();
+			SMeshComponent->DestroyComponent();
+			SMeshComponent->ConditionalBeginDestroy();
+			SMeshComponent->MarkAsGarbage();
+			SMeshComponent->MarkRenderStateDirty();
+			// SMeshComponent->ConditionalFinishDestroy();
+		}
+		else
+		{
+			UE_LOG(SplineActorLevelDesign, Error, TEXT("Invalid component encountered during cleanup."));
+		}
 	}
 
 	SplineMeshComponents.Empty();
 
-	int32 NumberOfSplinePoints = SplineComp->GetNumberOfSplinePoints();
+	GEngine->ForceGarbageCollection(true);
+
+
+	int32 NumberOfSplinePoints = SplineComp->GetNumberOfSplinePoints();		
+
+	UE_LOG(SplineActorLevelDesign, Warning, TEXT("Points:  %i"), NumberOfSplinePoints);
+	UE_LOG(SplineActorLevelDesign, Warning, TEXT("Segment: %i"), SplineComp->GetNumberOfSplineSegments());
+
+	int32 MeshCount = 0;
 
 	// Create spline mesh components between spline points.
-	for (int32 i = 0; i < NumberOfSplinePoints - 1; i++)
+	for (int32 i = 0; i < NumberOfSplinePoints - 1; ++i)
 	{
 		USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-		SplineMeshComponent->AttachToComponent(SplineComp, FAttachmentTransformRules::KeepRelativeTransform);
+
+		if (! SplineMeshComponent)
+		{
+			UE_LOG(SplineActorLevelDesign, Error, TEXT("Failed to create SplineMeshComponent."));
+			continue;
+		}
+
 		SplineMeshComponent->RegisterComponent();
 		SplineMeshComponent->SetRelativeTransform(SplineComp->GetRelativeTransform());
 
@@ -94,24 +142,30 @@ void ALDPathLengthActor::ConstructSplineMeshComponent()
 
 		SplineMeshComponent->SetStaticMesh(SplineMeshForComponent);
 
-		if (! MaterialInstance) return;
-
-		UMaterialInstanceDynamic* DynamicMaterial = SplineMeshComponent->CreateDynamicMaterialInstance(0, MaterialInstance);
-
-		if (! DynamicMaterial) return;
-
-		DynamicMaterial->SetVectorParameterValue(MaterialParameterName, MaterialColor);
+		SetInstanceMaterialAndParams(SplineMeshComponent);
 
 		FVector StartPoint, StartTangent, EndPoint, EndTangent;
 		SplineComp->GetLocationAndTangentAtSplinePoint(i, StartPoint, StartTangent, ESplineCoordinateSpace::Local);
 		SplineComp->GetLocationAndTangentAtSplinePoint(i + 1, EndPoint, EndTangent, ESplineCoordinateSpace::Local);
 
-
+		// SplineMeshComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		SplineMeshComponent->SetStartAndEnd(StartPoint, StartTangent, EndPoint, EndTangent);
 		SplineMeshComponent->SetStartScale(FVector2D(SplineMeshScale, SplineMeshScale));
 		SplineMeshComponent->SetEndScale(FVector2D(SplineMeshScale, SplineMeshScale));
 
 		SplineMeshComponents.Add(SplineMeshComponent);
 	}
+
+	MeshCount = SplineMeshComponents.Num();
+	UE_LOG(SplineActorLevelDesign, Error, TEXT("Spline Mesh Count:  %i"), MeshCount);
 }
-	
+
+void ALDPathLengthActor::SetInstanceMaterialAndParams(USplineMeshComponent* SplineMesh) 
+{
+	if (! MaterialInstance) return;
+
+	UMaterialInstanceDynamic* DynamicMaterial = SplineMesh->CreateDynamicMaterialInstance(0, MaterialInstance);
+	if (! DynamicMaterial) return;
+
+	DynamicMaterial->SetVectorParameterValue(MaterialParameterName, MaterialColor);
+}

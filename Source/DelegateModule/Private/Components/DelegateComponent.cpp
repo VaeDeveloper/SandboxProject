@@ -26,7 +26,6 @@ UDelegateComponent::UDelegateComponent(const FObjectInitializer& ObjectInitializ
 	TUniquePtr<SimpleRawClass> Raw(new SimpleRawClass());
 	UsualMulticastSumm.AddRaw(Raw.Get(), &SimpleRawClass::Summ);
 
-	SummStaticTest.AddStatic(&SimpleRawClass::StaticSumm);
 
 	UsualSumm.BindLambda([&](int a, int b, int& c) -> void { c = a + b; });
 
