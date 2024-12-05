@@ -2,6 +2,9 @@
 
 #include "TagComponent.h"
 #include "GameplayTagsManager.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(TagComponent)
 
 DEFINE_LOG_CATEGORY_STATIC(TagComponentLog, All, All)
 
@@ -23,12 +26,17 @@ bool UTagComponent::AddTagToContainer(const FGameplayTag& Tag)
 		UpdateTagMap(Tag, true);
 		OnTagAdded.Broadcast(Tag);
 
-		UE_LOG(TagComponentLog, Log, TEXT("Tag added: %s"), *Tag.ToString());
+		DEBUG_LOG(TagComponentLog, Log, TEXT("Tag added: %s"), *Tag.ToString());
 		return true;
 	}
 
-	UE_LOG(TagComponentLog, Warning, TEXT("Tag already exists: %s"), *Tag.ToString());
+	DEBUG_LOG(TagComponentLog, Warning, TEXT("Tag already exists: %s"), *Tag.ToString());
 	return false;
+}
+
+TArray<FGameplayTag> UTagComponent::GetArrayTagInContainer() const 
+{
+	return GetTagsContainer().GetGameplayTagArray();
 }
 
 void UTagComponent::MergeContainers(const FGameplayTagContainer& TagsToProcess)
@@ -49,11 +57,11 @@ bool UTagComponent::RemoveTagFromContainer(const FGameplayTag& Tag)
 	{
 		UpdateTagMap(Tag, false);
 		OnTagRemoved.Broadcast(Tag, bRemoved);
-		UE_LOG(TagComponentLog, Log, TEXT("Tag removed: %s"), *Tag.ToString());
+		DEBUG_LOG(TagComponentLog, Log, TEXT("Tag removed: %s"), *Tag.ToString());
 	}
 	else
 	{
-		UE_LOG(TagComponentLog, Warning, TEXT("Failed to remove tag: %s"), *Tag.ToString());
+		DEBUG_LOG(TagComponentLog, Warning, TEXT("Failed to remove tag: %s"), *Tag.ToString());
 	}
 
 	return bRemoved;
@@ -64,7 +72,7 @@ void UTagComponent::RemoveAllTagsFromContainer(const FGameplayTagContainer& Tags
 	for (const FGameplayTag& Tag : TagsToProcess)
 	{
 		RemoveTagFromContainer(Tag);
-		UE_LOG(TagComponentLog, Log, TEXT("Remove Tag: %s "), *Tag.ToString());
+		DEBUG_LOG(TagComponentLog, Log, TEXT("Remove Tag: %s "), *Tag.ToString());
 	}
 }
 
@@ -104,19 +112,11 @@ bool UTagComponent::DoesContainerHaveExactTag(const FGameplayTag& TagToCheck)
 {
 	if (! TagToCheck.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid tag provided for exact match check."));
+		DEBUG_LOG(LogTemp, Warning, TEXT("Invalid tag provided for exact match check."));
 		return false;
 	}
 
-	for (const FGameplayTag& Tag : TagContainer)
-	{
-		if (Tag.MatchesTagExact(TagToCheck))
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return ContainerHasTag(TagToCheck, true);
 }
 
 void UTagComponent::UpdateTagMap(const FGameplayTag& Tag, bool bAdd) 
@@ -135,7 +135,7 @@ void UTagComponent::UpdateParentTagCache()
 {
 	if (TagContainer.IsEmpty())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TagContainer is empty. No parent tags to update."));
+		DEBUG_LOG(LogTemp, Warning, TEXT("TagContainer is empty. No parent tags to update."));
 		return;
 	}
 
@@ -152,3 +152,11 @@ void UTagComponent::UpdateParentTagCache()
 }
 
 
+void UTagComponent::DebugTagContainer()
+{
+	for (FGameplayTag Tag : GetArrayTagInContainer())
+	{
+		DEBUG_LOG(TagComponentLog, Log, TEXT("Tag Name : %s"), *Tag.ToString());
+		UKismetSystemLibrary::PrintString(GetWorld(), *Tag.ToString());
+	}
+}

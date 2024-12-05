@@ -26,8 +26,18 @@ TArray<FGameplayTag> UTagsFunctionLibrary::GetBreakTags(UObject* WorldContextObj
 	if (! TagComponent) return TArray<FGameplayTag>();
 
 	TArray<FGameplayTag> GameplayTags = TagComponent->GetTagsContainer().GetGameplayTagArray();
+	if (GameplayTags.IsEmpty()) return TArray<FGameplayTag>();
 
 	return GameplayTags;
+}
+
+bool UTagsFunctionLibrary::AddTagToComponentTagContainer(UObject* WorldContextObject, const FGameplayTag& Tag)
+{
+	UTagComponent* TagComponent = GetTagComponent(WorldContextObject);
+	if (! TagComponent || !Tag.IsValid()) return false;
+	
+	TagComponent->AddTagToContainer(Tag);
+	return true;
 }
 
 

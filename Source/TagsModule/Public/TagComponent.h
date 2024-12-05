@@ -6,8 +6,15 @@
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 
-
 #include "TagComponent.generated.h"
+
+
+
+#if ! (UE_BUILD_SHIPPING || UE_BUILD_TEST) || USE_LOGGING_IN_SHIPPING
+#define DEBUG_LOG(CategoryName, Verbosity, Format, ...) UE_LOG(CategoryName, Verbosity, Format, ##__VA_ARGS__)
+#else
+#define DEBUG_LOG(CategoryName, Verbosity, Format, ...)
+#endif
 
 /**
  * Dynamic multicast delegate triggered when a tag is added.
@@ -47,12 +54,18 @@ public:
 	FORCEINLINE FGameplayTagContainer GetTagsContainer() const;
 
 	/**
+	 *
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent")
+	TArray<FGameplayTag> GetArrayTagInContainer() const;
+
+	/**
 	 * Adds a tag to the container if it doesn't already exist.
 	 *
 	 * @param Tag The gameplay tag to add.
 	 * @return True if the tag was successfully added; false if it already exists.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Tags Component")
+	UFUNCTION(BlueprintCallable, Category = "Tags Component", meta = (AutoCreateRefTerm = "Tag"))
 	bool AddTagToContainer(const FGameplayTag& Tag);
 
 	/**
@@ -70,7 +83,7 @@ public:
 	 * @param Tag The gameplay tag to remove.
 	 * @return True if the tag was successfully removed; false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "TagsComponent")
+	UFUNCTION(BlueprintCallable, Category = "TagsComponent", meta = (AutoCreateRefTerm = "Tag"))
 	bool RemoveTagFromContainer(const FGameplayTag& Tag);
 
 	/**
@@ -98,7 +111,7 @@ public:
 	 * @param Exact If true, requires an exact match; otherwise, allows partial matches.
 	 * @return True if all tags match; false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent", meta = (AutoCreateRefTerm = "TagsToProcess"))
 	FORCEINLINE bool ContainerHasAllTags(const FGameplayTagContainer& TagsToProcess, bool Exact = false) const;
 
 	/**
@@ -108,7 +121,7 @@ public:
 	 * @param Exact If true, requires an exact match; otherwise, allows partial matches.
 	 * @return True if the tag is present; false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent", meta = (AutoCreateRefTerm = "Tag"))
 	FORCEINLINE bool ContainerHasTag(const FGameplayTag& Tag, bool Exact = false) const;
 
 	/**
@@ -119,7 +132,7 @@ public:
 	 * @param ErrorIfNotFound If true, ensures the tag exists in the container.
 	 * @return The found FGameplayTag, or an empty FGameplayTag if not found.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent", meta = (AutoCreateRefTerm = "TagName"))
 	FGameplayTag FindGameplayTagByName(const FName& TagName, bool ErrorIfNotFound = false);
 
 	/**
@@ -129,8 +142,15 @@ public:
 	 * @param TagToCheck The tag to look for.
 	 * @return True if a tag that exactly matches TagToCheck is found in the container, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "TagsComponent")
+	UFUNCTION(BlueprintCallable, Category = "TagsComponent", meta = (AutoCreateRefTerm = "TagToCheck"))
 	bool DoesContainerHaveExactTag(const FGameplayTag& TagToCheck);
+
+#if WITH_EDITORONLY_DATA
+
+	UFUNCTION(BlueprintCallable, Category = "TagsComponent|Debug")
+	void DebugTagContainer();
+
+#endif
 
 public:
 	/** The container that holds all gameplay tags managed by this component. */
@@ -145,12 +165,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "TagsComponent|Delegated")
 	FOnTagRemovedDelegate OnTagRemoved;
 
-
 private:
 	void UpdateTagMap(const FGameplayTag& Tag, bool bAdd);
 	void UpdateParentTagCache();
 
 	TMap<FName, FGameplayTag> TagMap;
 	TSet<FGameplayTag> ParentTagCache;
-
 };

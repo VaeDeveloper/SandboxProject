@@ -53,4 +53,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Tags Library", meta = (WorldContext = "WorldContextObject"))
 	static TArray<FGameplayTag> GetBreakTags(UObject* WorldContextObject);
+
+	/**
+	 *
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Tags Library", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "Tag"))
+	bool AddTagToComponentTagContainer(UObject* WorldContextObject, const FGameplayTag& Tag);
 };
