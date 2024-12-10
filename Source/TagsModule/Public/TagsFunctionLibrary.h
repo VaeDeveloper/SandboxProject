@@ -18,23 +18,6 @@ class TAGSMODULE_API UTagsFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-	/**
-	 * 
-	 */
-	static inline AActor* GetOwner(UObject* Context)
-	{
-		AActor* Owner = Cast<AActor>(Context);
-		if (! Owner)
-		{
-			UActorComponent* OwningComponent = Cast<UActorComponent>(Owner);
-			if (! OwningComponent) return nullptr;
-
-			Owner = OwningComponent->GetOwner();
-		}
-
-		return Owner;
-	}
-
 public:
 	/**
 	 *
@@ -59,4 +42,23 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Tags Library", meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "Tag"))
 	bool AddTagToComponentTagContainer(UObject* WorldContextObject, const FGameplayTag& Tag);
+
+
+private:
+	/**
+	 * Getter Owner Function Helper
+	 */
+	static inline AActor* GetOwner(UObject* Context)
+	{
+		AActor* Owner = Cast<AActor>(Context);
+		if (! Owner)
+		{
+			UActorComponent* OwningComponent = Cast<UActorComponent>(Owner);
+			if (! OwningComponent) return nullptr;
+
+			Owner = OwningComponent->GetOwner();
+		}
+
+		return Owner;
+	}
 };

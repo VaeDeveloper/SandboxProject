@@ -8,8 +8,27 @@
 
 #include "TagComponent.generated.h"
 
-
-
+/**
+ * This macro defines logging behavior for debugging purposes.
+ *
+ * Depending on the build configuration (e.g., Shipping or Test build),
+ * it either enables or disables logging. It allows conditional logging
+ * in non-shipping builds (e.g., Development, Debug) while ensuring that
+ * log statements are omitted in Shipping builds to improve performance and
+ * avoid leaking debug information.
+ *
+ * In shipping or test builds, the logging is disabled by default, unless
+ * the `USE_LOGGING_IN_SHIPPING` preprocessor directive is defined.
+ *
+ * Usage:
+ *  - In non-shipping builds, logs are printed using `UE_LOG` with the provided category, verbosity, and format.
+ *  - In shipping builds, this macro is no-op and will not generate any log output.
+ *
+ * @param CategoryName The log category (e.g., TagComponentLog) to use for the log message.
+ * @param Verbosity The verbosity level (e.g., Log, Warning, Error) of the log message.
+ * @param Format The format string, similar to `printf` formatting, that specifies how the log message should be formatted.
+ * @param ... Additional arguments to pass into the format string, as in `printf`.
+ */
 #if ! (UE_BUILD_SHIPPING || UE_BUILD_TEST) || USE_LOGGING_IN_SHIPPING
 #define DEBUG_LOG(CategoryName, Verbosity, Format, ...) UE_LOG(CategoryName, Verbosity, Format, ##__VA_ARGS__)
 #else
@@ -92,7 +111,7 @@ public:
 	 * @param inTagsContainer A container of tags to remove.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "TagsComponent")
-	void RemoveAllTagsFromContainer(const FGameplayTagContainer& TagsToProcess);
+	void RemoveAllTagsFromContainer();
 
 	/**
 	 * Checks if the container has any tags from the specified container.
@@ -133,7 +152,7 @@ public:
 	 * @return The found FGameplayTag, or an empty FGameplayTag if not found.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent", meta = (AutoCreateRefTerm = "TagName"))
-	FGameplayTag FindGameplayTagByName(const FName& TagName, bool ErrorIfNotFound = false);
+	FGameplayTag FindGameplayTagByName(const FName& TagName, bool ErrorIfNotFound = false) const;
 
 	/**
 	 * Checks if a tag that exactly matches the provided tag exists in the container.
@@ -145,30 +164,123 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TagsComponent", meta = (AutoCreateRefTerm = "TagToCheck"))
 	bool DoesContainerHaveExactTag(const FGameplayTag& TagToCheck);
 
+	/**
+	 * Retrieves the container holding all parent tags for the current tag container.
+	 *
+	 * This function returns the full set of parent tags for the tags managed by this component.
+	 *
+	 * @return A FGameplayTagContainer containing all the parent tags.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FGameplayTagContainer GetParentTagContainer() const;
+
+	/**
+	 * Retrieves the parent tags associated with a specific tag identified by its name.
+	 *
+	 * This function looks up the tag by its name and returns all the parent tags for the found tag.
+	 * If the tag is not found, it returns an empty container.
+	 *
+	 * @param TagName The name of the tag whose parent tags are to be retrieved.
+	 * @return A FGameplayTagContainer containing the parent tags of the specified tag.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TagsComponent", meta = (AutoCreateRefTerm = "TagName"))
+	FGameplayTagContainer GetParentTagArrayByName(const FName& TagName) const;
+
+
 #if WITH_EDITORONLY_DATA
 
+	/**
+	 * Debug function to print and inspect the tag container.
+	 *
+	 * This function will output all tags currently in the tag container for debugging purposes.
+	 * It is available only in the editor.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "TagsComponent|Debug")
 	void DebugTagContainer();
 
 #endif
 
-public:
-	/** The container that holds all gameplay tags managed by this component. */
+	/**
+	 * The container that holds all gameplay tags managed by this component.
+	 *
+	 * This container stores the tags added to the component. It is used to keep track of all active gameplay tags
+	 * and is used in various functions to add, remove, or query tags.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TagsComponent|GameplayTags", meta = (DisplayName = "TagsContainer"))
 	FGameplayTagContainer TagContainer;
 
-	/** Delegate triggered when a tag is added to the container. */
+	/**
+	 * Delegate triggered when a tag is added to the container.
+	 *
+	 * This delegate is broadcasted whenever a tag is successfully added to the TagContainer.
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "TagsComponent|Delegated")
 	FOnTagAddedDelegate OnTagAdded;
 
-	/** Delegate triggered when a tag is removed from the container. */
+	/**
+	 * Delegate triggered when a tag is removed from the container.
+	 *
+	 * This delegate is broadcasted whenever a tag is successfully removed from the TagContainer.
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "TagsComponent|Delegated")
 	FOnTagRemovedDelegate OnTagRemoved;
 
 private:
+	/**
+	 * Updates the internal map with the tag, either adding or removing it based on the flag.
+	 *
+	 * This method ensures that the internal map, TagMap, is updated whenever a tag is added or removed. The update
+	 * operation will add or remove the tag based on the provided flag (bAdd).
+	 *
+	 * @param Tag The tag to be added or removed from the map.
+	 * @param bAdd Whether to add (true) or remove (false) the tag from the map.
+	 */
 	void UpdateTagMap(const FGameplayTag& Tag, bool bAdd);
+
+	/**
+	 * Updates the cache of parent tags for the current tag container.
+	 *
+	 * This method updates the ParentTagCache to reflect the latest set of parent tags associated with the tags
+	 * in the TagContainer. It is typically called when tags are added or removed.
+	 */
 	void UpdateParentTagCache();
 
+	/**
+	 * Begins a batch operation for tag management.
+	 *
+	 * This method is used to prepare for a batch of operations on the tag container, temporarily disabling automatic
+	 * updates to the parent tag cache during the batch.
+	 */
+	void BeginBatchOperations();
+
+	/**
+	 * Ends the batch operation and restores normal behavior.
+	 *
+	 * This method finalizes the batch operation, re-enables the automatic updating of the parent tag cache, and
+	 * ensures the cache is updated accordingly.
+	 */
+	void EndBatchOperations();
+
+	/**
+	 * A flag indicating whether the parent tag cache should be updated after batch operations.
+	 *
+	 * This flag is used to control whether the parent tag cache is updated during or after batch operations.
+	 */
+	bool bShouldUpdateParentTagCache = true;
+
+	/**
+	 * A map that holds all the tags by their name for fast look-up.
+	 *
+	 * The TagMap is used for efficient retrieval of gameplay tags based on their name. It helps in checking if a
+	 * specific tag exists or needs to be added to the container.
+	 */
 	TMap<FName, FGameplayTag> TagMap;
-	TSet<FGameplayTag> ParentTagCache;
+
+	/**
+	 * A cache of parent tags for efficient access and management.
+	 *
+	 * The ParentTagCache holds the parent tags for all tags in the container. This cache is updated whenever
+	 * the tag container is modified and is used to quickly retrieve parent tag data.
+	 */
+	TArray<FGameplayTag> ParentTagCache;
 };
