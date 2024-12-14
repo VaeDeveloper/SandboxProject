@@ -65,11 +65,11 @@ protected:
 
 	/** Size of the text in the TextRender component. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
-	float TextRenderSize = 50.0f;
+	float TextRenderSize = 250.0f;
 
 	/** spline mesh scale value */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "0.06", ClampMax = "2"))
-	float SplineMeshScale = 1.0f;
+	float SplineMeshScale = 0.3f;
 
 	/** Color used in the material applied to the spline mesh. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (ClampMin = "50", ClampMax = "500"))
